@@ -1,0 +1,120 @@
+// schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/app/generated/prisma"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+model User {
+  id       String    @id @default(cuid())
+  username String    @unique
+  password String
+  sessions Session[]
+  accounts Account[]
+
+  // Relations
+  guesses     Guess[]
+  gameConfigs GameConfig[] @relation("UserGameConfigs")
+
+  // Per-game state for this user
+  gameStates UserState[]
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  userId            String
+  user              User    @relation(fields: [userId], references: [id])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model GameConfig {
+  id                    String  @id @default(cuid())
+  name                  String
+  guessingPeriod        Int // in ms, min 5000
+  scoreStreaksEnabled   Boolean @default(false)
+  scoreStreakThresholds String? // e.g. "1:1;2:3" or "f(n;n*n)"
+  bettingMode           Boolean @default(false)
+  maxPlayers            Int     @default(0)
+  duration              Int?    @default(0) // ms, >= guessingPeriod + 60000; null = infinite
+
+  games  Game[]  @relation("ConfigGames")
+  userId String? // if not set, it's a default config
+  user   User?   @relation("UserGameConfigs", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Game {
+  id            String     @id @default(cuid())
+  name          String
+  start         DateTime   @default(now())
+  end           DateTime?
+  configId      String
+  passcode      String
+  private       Boolean
+  gameConfig    GameConfig @relation("ConfigGames", fields: [configId], references: [id])
+  recentGuesses Guess[]
+
+  // Per-user state for this game
+  userStates UserState[]
+}
+
+model Guess {
+  id        String    @id @default(cuid())
+  type      GuessType
+  price     Float
+  timestamp DateTime
+  period    Int
+  outcome   Boolean?
+  userId    String
+  gameId    String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+}
+
+model UserState {
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  gameId String
+
+  score    Int      @default(0)
+  joinedAt DateTime @default(now())
+
+  @@unique([userId, gameId])
+}
+
+enum GuessType {
+  up
+  down
+}
