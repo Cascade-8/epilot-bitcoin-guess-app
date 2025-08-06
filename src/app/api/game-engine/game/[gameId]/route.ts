@@ -7,14 +7,14 @@ import { authOptions } from '@/lib/auth'
 
 export const GET = async (
   _req: NextRequest,
-  { params }: { params: { gameId: string } }
+  context: { params: Promise<{ gameId: string }> }
 ) => {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) 
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   
   const userId = session.user.id
-  const { gameId } = await params
+  const { gameId } = await context.params
   // fetch the game with its config and per-user states
   const game = await prisma.game.findUnique({
     where: { id: gameId },

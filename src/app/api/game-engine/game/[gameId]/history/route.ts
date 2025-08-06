@@ -7,13 +7,13 @@ import type { NextRequest } from 'next/server'
 
 export const GET = async(
   _req: NextRequest,
-  { params }: { params: { gameId: string } }
+  context: { params: Promise<{ gameId: string }> }
 ) => {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) 
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   
-  const { gameId } = await params
+  const { gameId } = await context.params
 
   const history = await prisma.guess.findMany({
     where: { gameId },

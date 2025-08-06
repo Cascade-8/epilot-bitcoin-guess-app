@@ -9,14 +9,14 @@ import { broadcast } from '@/lib/GameInfoSocket'
 
 export const POST = async (
   req: NextRequest,
-  { params }: { params: { gameId: string } }
+  context: { params: Promise<{ gameId: string }> }
 ): Promise<NextResponse> => {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) 
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   
   const userId = session.user.id
-  const { gameId } = await params
+  const { gameId } = await context.params
   const { type, price, timestamp } = (await req.json()) as {
     type: 'up' | 'down'
     price: number
