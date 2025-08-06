@@ -2,10 +2,10 @@
 import React from 'react'
 import Link from 'next/link'
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import prisma from '@/lib/prisma'
 import { GenericButton } from '@/components/atoms/buttons/GenericButton'
 import { GameConfigLine } from '@/app/(protected)/game-engine/config/_components/GameConfigLine'
+import { authOptions } from '@/lib/auth'
 
 export default async function ConfigOverviewPage() {
   const session = await getServerSession(authOptions)

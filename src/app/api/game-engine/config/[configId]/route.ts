@@ -1,7 +1,7 @@
 // app/api/game-engine/config/[configId]/route.ts
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 
 const MIN_GUESSING_PERIOD = 5000
