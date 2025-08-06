@@ -1,4 +1,5 @@
 // app/api/game-engine/stream/route.ts
+import '@/lib/bootstrap'
 import { NextRequest } from 'next/server'
 import { subscribe as subscribePrice } from '@/lib/priceStoreRedis'
 import { subscribeGame }                         from '@/lib/gameStoreRedis'
