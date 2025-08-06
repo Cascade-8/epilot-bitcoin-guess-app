@@ -10,6 +10,11 @@ interface Particle {
   emoji: string
 }
 
+/**
+ * Confetti Rain for failure
+ * @param trigger The trigger that sets off the rain
+ * @param emojis Emojis to fall down
+ */
 export const ConfettiFailure: React.FC<{ trigger: boolean, emojis: string[] }> = ({ trigger, emojis }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animRef = useRef<number | null>(null)
@@ -37,7 +42,7 @@ export const ConfettiFailure: React.FC<{ trigger: boolean, emojis: string[] }> =
       x: Math.random() * W,
       y: -Math.random() * 750,
       vy: 2 + Math.random() * 2,
-      size: 20 + Math.random() * 75,
+      size: 20 + Math.random() * 50,
       emoji: emojis[Math.floor(Math.random() * emojis.length)],
     }))
 

@@ -1,8 +1,5 @@
-// src/components/atoms/buttons/GenericButton.tsx
 'use client'
-
 import React, { ReactNode } from 'react'
-
 type GenericButtonProps = {
   children?: ReactNode
   onClick?: (e?: any) => void
@@ -11,6 +8,15 @@ type GenericButtonProps = {
   className?: string
 }
 
+/**
+ * Generic Button element that is controlled from the outside
+ * @param children optional children to display notifications etc
+ * @param onClick onClick callback function to be executed on click
+ * @param disabled sets the button disabled
+ * @param type decides if it is a normal button or part of a form
+ * @param className to override existing classNames use !<xyz> to mark them as important
+ * @constructor
+ */
 const GenericButton: React.FC<GenericButtonProps> = ({
   children,
   onClick,
@@ -19,7 +25,7 @@ const GenericButton: React.FC<GenericButtonProps> = ({
   className = '',
 }) => {
   const baseStyle =
-    'w-full text-base h-full border-2 border-indigo-400 bg-indigo-600 text-gray-200 rounded-full cursor-pointer'
+    'w-full text-base h-full border-2 border-indigo-400 bg-indigo-600 text-gray-200 rounded-full cursor-pointer relative'
   const hoverStyle = 'hover:border-indigo-300 hover:bg-indigo-500'
   const activeStyle = 'enabled:border-indigo-400 enabled:bg-indigo-600'
   const disabledStyle =

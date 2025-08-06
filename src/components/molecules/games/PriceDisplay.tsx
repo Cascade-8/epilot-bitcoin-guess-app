@@ -1,4 +1,3 @@
-// src/components/atoms/PriceDisplay.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -7,6 +6,9 @@ import { faArrowUpRightDots } from '@fortawesome/free-solid-svg-icons'
 import { useBitcoinPrices } from '@/context/BitcoinPriceContext'
 
 const PRICE_BUFFER_LENGTH = 10
+/**
+ * PriceDisplay with render icon to show the current price and trend
+ */
 export const PriceDisplay = () => {
   const { recentPrices } = useBitcoinPrices()
   const [trendDirection, setTrendDirection] = useState<'up' | 'down' | null>(null)

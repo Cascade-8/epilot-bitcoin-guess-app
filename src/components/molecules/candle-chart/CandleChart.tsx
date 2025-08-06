@@ -30,11 +30,15 @@ export interface ChartConfig {
 }
 
 interface CandleChartProps {
-  /** Tailwind-safe minHeight, e.g. 'min-h-[150px]' or 'min-h-0' */
   minHeightClass?: string
   config?: ChartConfig
 }
 
+/**
+ * Basic candle chart component
+ * @param minHeightClass Min Height for the chart
+ * @param config Handle display settings for the chart
+ */
 export const CandleChart: FunctionComponent<CandleChartProps> = ({
   minHeightClass = 'min-h-[150px]',
   config = {},

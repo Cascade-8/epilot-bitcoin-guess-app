@@ -30,7 +30,9 @@ export const useBitcoinPrices = (): BitcoinPriceContextType => {
   
   return ctx
 }
-
+/**
+ * Bitcoin Price Context to provide the children with the current prices and make them update on every price change
+ */
 export const BitcoinPriceProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {

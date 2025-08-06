@@ -4,6 +4,11 @@ import { CandleChart } from '@/components/molecules/candle-chart/CandleChart'
 import { PriceDisplay } from '@/components/molecules/games/PriceDisplay'
 import { GameControls } from '@/components/molecules/games/GameControls'
 
+/**
+ * Game Canvas to display the game on different devices
+ * CandleChart config gets slightly adjusted to enable responsive functionalities
+ * @constructor
+ */
 const GameCanvas: FC = () => {
   return (
     <div className="flex flex-col px-4 sm:px-6 py-6 bg-indigo-800 border-2 border-indigo-500 text-gray-100 rounded-xl shadow-lg w-full h-full max-h-screen">

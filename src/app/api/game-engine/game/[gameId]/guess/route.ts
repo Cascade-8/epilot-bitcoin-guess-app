@@ -1,4 +1,3 @@
-// src/app/(protected)/game-engine/game/[gameId]/guess/route.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import prisma from '@/lib/services/prisma'
@@ -14,7 +13,6 @@ export const POST = async (
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) 
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  
 
   const userId = session.user.id
   const { gameId } = await context.params
@@ -28,7 +26,6 @@ export const POST = async (
       { error: 'type, price, and timestamp are required' },
       { status: 400 }
     )
-  
 
   const now = Date.now()
   if (now - timestamp > 2000) 
@@ -41,15 +38,12 @@ export const POST = async (
   })
   if (!game) 
     return NextResponse.json({ error: 'Game not found' }, { status: 404 })
-  
 
   const isParticipant = game.userStates.some(s => s.userId === userId)
   const isPublic = !game.private && game.passcode === ''
   if (!isParticipant && !isPublic) 
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  
 
-  // Create the guess in Postgres; guess.timestamp is now a Date object
   const guess = await prisma.guess.create({
     data: {
       userId,
@@ -61,17 +55,14 @@ export const POST = async (
     },
   })
 
-  // Emit the immediate guess event
   addGameEvent(gameId, userId, {
     event: 'guess',
     data: guess,
   })
 
-  // Derive dueTimestamp from the stored Date + period
   const guessTimeMs = guess.timestamp.getTime()
   const dueTimestamp = guessTimeMs + guess.period
 
-  // Enqueue in Redis: score=dueTimestamp, member=task JSON
   await redis.zadd(
     'game:guess:queue',
     dueTimestamp,

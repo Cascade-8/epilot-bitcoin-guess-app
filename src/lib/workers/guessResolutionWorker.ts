@@ -7,6 +7,9 @@ import { addGameEvent } from '@/lib/stores/gameStoreRedis'
 const KEY_SCHEDULE = 'game:guess:queue'
 const POLL_INTERVAL = 1000 // 1s
 
+/**
+ * Process Scheduler to check when a guess is resolved
+ */
 const processDue = async () => {
   const now = Date.now()
 

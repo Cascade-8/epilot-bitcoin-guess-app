@@ -14,6 +14,11 @@ interface Particle {
   img?: HTMLCanvasElement
 }
 
+/**
+ * Two confetti cannons on trigger
+ * @param trigger the trigger to start the animation
+ * @param emojis emopis or characters to use as confetti. Fallback are rectangular particles
+ */
 export const ConfettiSuccess: React.FC<{
   trigger: boolean
   emojis?: string[]

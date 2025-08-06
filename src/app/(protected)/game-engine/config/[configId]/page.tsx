@@ -18,7 +18,6 @@ export default function ConfigPage() {
   const [editing, setEditing] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
-  // load config on mount
   useEffect(() => {
     const load = async () => {
       setError(null)
@@ -42,7 +41,7 @@ export default function ConfigPage() {
         setLoading(false)
       }
     }
-    load()
+    load().then()
   }, [configId, addToast])
 
   const handleSave = async (data: GameConfig) => {

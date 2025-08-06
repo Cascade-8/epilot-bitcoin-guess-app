@@ -14,7 +14,6 @@ export const POST = async(req: Request) => {
     })
     return NextResponse.json({ id: user.id, username: user.username, password: user.password }, { status: 201 })
   } catch (e: any) {
-    console.error(e)
     return NextResponse.json({ error: e.message }, { status: 500 })
   }
 }

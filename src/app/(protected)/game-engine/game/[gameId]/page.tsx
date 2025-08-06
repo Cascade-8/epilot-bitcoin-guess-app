@@ -1,4 +1,3 @@
-// src/app/(protected)/game-engine/game/[gameId]/page.tsx
 'use client'
 
 import React, { useEffect, useState } from 'react'

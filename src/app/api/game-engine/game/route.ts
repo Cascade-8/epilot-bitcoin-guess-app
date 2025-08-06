@@ -65,9 +65,7 @@ export const PATCH = async (req: NextRequest) => {
 
   if (game.userStates.some(s => s.userId === userId)) 
     return NextResponse.json({ error: 'Already joined' }, { status: 400 })
-  
 
-  // Create initial state record
   const updatedGame = await prisma.game.update({
     where: { id: gameId },
     data: {
@@ -85,7 +83,7 @@ export const PATCH = async (req: NextRequest) => {
 }
 
 export const POST = async (req: Request) => {
-  // 1) authentication
+
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) 
     return NextResponse.json(
@@ -95,7 +93,6 @@ export const POST = async (req: Request) => {
   
   const userId = session.user.id
 
-  // 2) parse & validate
   const { name, configId, isPrivate = false, passcode } =
     (await req.json()) as {
       name: string
@@ -115,9 +112,7 @@ export const POST = async (req: Request) => {
       { error: 'Config ID is required' },
       { status: 400 }
     )
-  
 
-  // 3) ensure config exists
   const cfg = await prisma.gameConfig.findUnique({
     where: { id: configId },
   })
@@ -126,9 +121,7 @@ export const POST = async (req: Request) => {
       { error: 'Invalid config' },
       { status: 400 }
     )
-  
 
-  // 4) create game + initial userState (join creator)
   const game = await prisma.game.create({
     data: {
       name: name.trim(),

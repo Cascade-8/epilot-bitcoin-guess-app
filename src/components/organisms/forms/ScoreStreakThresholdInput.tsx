@@ -1,6 +1,8 @@
-// src/components/molecules/ScoreStreakThresholdInput.tsx
 'use client'
-
+/**
+ * Experimental functionality to handle complex scoring functions.
+ * Due to time, I could not finish it.
+ */
 import React, { useMemo } from 'react'
 import GenericInput from '@/components/atoms/input/GenericInput'
 

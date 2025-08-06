@@ -9,7 +9,7 @@ import {
   faTimesCircle,
 } from '@fortawesome/free-solid-svg-icons'
 
-// Types
+
 interface Toast {
   id: number
   message: string
@@ -21,10 +21,12 @@ type ToastContextType = {
   addToast: (message: string, type?: Toast['type']) => void
 }
 
-// Context
+
 const ToastContext = createContext<ToastContextType | undefined>(undefined)
 
-// Provider
+/**
+ * Handle toast notifications across pages
+ */
 const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([])
 

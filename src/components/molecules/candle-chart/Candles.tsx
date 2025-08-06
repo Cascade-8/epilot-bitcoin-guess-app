@@ -16,6 +16,17 @@ interface CandlesProps {
   minWickPx: number
   minBodyPx: number
 }
+
+/**
+ *
+ * @param candles Candle Elements
+ * @param xScale  X Scale
+ * @param yScale  Y Scale
+ * @param maxCandleWidth Maximum width a candle can have to enable responsive candle designs in px
+ * @param minWickPx minimal width of the wick of the candle in px
+ * @param minBodyPx minimal body width in px
+ * @constructor
+ */
 const Candles: FunctionComponent<CandlesProps> = ({ candles, xScale, yScale, maxCandleWidth, minWickPx, minBodyPx }) => (
   <>
     {candles.map((c, i) => {

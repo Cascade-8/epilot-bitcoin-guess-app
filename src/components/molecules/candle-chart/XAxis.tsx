@@ -9,6 +9,15 @@ interface XAxisLabelsProps {
   innerH: number
   displayLabels: number
 }
+
+/**
+ * XAxis Label Helper function to control the Label style
+ * @param candles Candles
+ * @param xScale  X Scale
+ * @param innerH inner height
+ * @param displayLabels Selects how many labels are displayed to prevent overcrowding
+ * @constructor
+ */
 const XAxisLabels: FunctionComponent<XAxisLabelsProps> = ({ candles, xScale, innerH, displayLabels }) => {
   const interval = Math.max(1, Math.floor(candles.length / displayLabels))
   return (

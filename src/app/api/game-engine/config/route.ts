@@ -1,4 +1,3 @@
-// app/api/game-engine/config/route.ts
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/services/prisma'
 import { getServerSession } from 'next-auth/next'
@@ -19,23 +18,15 @@ export type ConfigPayload = {
   duration?: number
 }
 
-// ── GET /api/game-engine/config ──
 export const GET = async () => {
-  // get current user (if any)
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id
-
-  // fetch default (public) configs
   const defaultConfigsPromise = prisma.gameConfig.findMany({
     where: { userId: null },
   })
-
-  // fetch owned configs if logged in
   const ownedConfigsPromise = userId
     ? prisma.gameConfig.findMany({ where: { userId } })
     : []
-
-  // fetch shared configs if logged in
   const sharedConfigsPromise = userId
     ? prisma.gameConfig.findMany({
       where: {
@@ -65,20 +56,14 @@ export const GET = async () => {
   })
 }
 
-// ── POST /api/game-engine/config ──
-
 export const POST = async (req: Request) => {
-  // 1) Auth
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) 
     return NextResponse.json(
       { error: 'Not authenticated' },
       { status: 401 }
     )
-  
   const userId = session.user.id
-
-  // 2) Parse & validate
   const {
     name,
     guessingPeriod,
@@ -94,21 +79,16 @@ export const POST = async (req: Request) => {
       { error: `guessingPeriod must be ≥ ${MIN_GUESSING_PERIOD}ms` },
       { status: 400 }
     )
-  
   if (duration !== 0 && duration < guessingPeriod + MIN_DURATION_OFFSET) 
     return NextResponse.json(
       { error: `duration must be 0 or ≥ period + ${MIN_DURATION_OFFSET}ms` },
       { status: 400 }
     )
-  
   if (maxPlayers < 0 || maxPlayers > MAX_PLAYERS) 
     return NextResponse.json(
       { error: `maxPlayers must be between 0 and ${MAX_PLAYERS}` },
       { status: 400 }
     )
-  
-
-  // 3) Build payload, include the owner
   const data: any = {
     name,
     guessingPeriod,
@@ -116,13 +96,10 @@ export const POST = async (req: Request) => {
     bettingMode,
     maxPlayers,
     duration,
-    userId,                      // ← set the owner here
+    userId,
   }
   if (scoreStreaksEnabled) 
     data.scoreStreakThresholds = scoreStreakThresholds || ''
-  
-
-  // 4) Create
   const config = await prisma.gameConfig.create({ data })
   return NextResponse.json(config, { status: 201 })
 }

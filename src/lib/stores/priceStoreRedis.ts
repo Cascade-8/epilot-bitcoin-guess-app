@@ -1,4 +1,7 @@
-// src/lib/priceStoreRedis.ts
+/**
+ * Price Storage file to store the streamed prices into redit
+ */
+
 import Redis from 'ioredis'
 import { redis } from '../services/redisClient'
 

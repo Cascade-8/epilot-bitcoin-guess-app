@@ -1,4 +1,3 @@
-// src/context/GameContext.tsx
 'use client'
 
 import React, {
@@ -20,6 +19,10 @@ interface GameContextType {
 }
 export type GuessRequest = Pick<Guess, 'type' | 'price' | 'timestamp'>
 
+
+/**
+ * Context to handle the game states and game updates received from the Event Stream
+ */
 const GameContext = createContext<GameContextType | undefined>(undefined)
 export const useGame = (): GameContextType => {
   const ctx = useContext(GameContext)

@@ -1,17 +1,22 @@
-// src/components/GameConfigCard.tsx
 'use client'
 
 import React, { ReactNode } from 'react'
 import { GameConfig } from '@/app/generated/prisma'
 
 
-interface GameConfigCardProps {
+interface GameConfigLineProps {
   config: GameConfig
   cta?: ReactNode
   onClick?: () => void
 }
 
-export const GameConfigLine: React.FC<GameConfigCardProps> = ({
+/**
+ * Game Config line element
+ * @param config the config to be displayed
+ * @param cta a cta element displayed inside the line element
+ * @param onClick callback function when the line is clicked on
+ */
+export const GameConfigLine: React.FC<GameConfigLineProps> = ({
   config,
   cta,
   onClick,

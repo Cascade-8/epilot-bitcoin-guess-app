@@ -1,4 +1,3 @@
-// src/app/(protected)/game/config/page.tsx
 import React from 'react'
 import Link from 'next/link'
 import { getServerSession } from 'next-auth/next'

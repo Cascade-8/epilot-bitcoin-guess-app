@@ -11,6 +11,17 @@ interface PriceLineProps {
   offsetX?: number
 }
 
+/**
+ * Dynamic Line to mark Prices f.e. the current price or a guessed price
+ * @param yPosition The y position of the line
+ * @param innerW  The length
+ * @param label The description of the line
+ * @param strokeClass the colour of the line
+ * @param fillClass the text colour of the label
+ * @param dashArray style of the line
+ * @param labelSide alignment of the label
+ * @param offsetX Offset of the label
+ */
 const PriceLine: FunctionComponent<PriceLineProps> = ({
   yPosition,
   innerW,

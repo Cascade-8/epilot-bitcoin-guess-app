@@ -6,6 +6,11 @@ import { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faGamepad, faCogs, faExpand, faCompress, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
 
+
+/**
+ * Bottom navigation element
+ * Slides out of view on mobile devices and can get pulled up by a quick swipe up
+ */
 const BottomNav = () => {
   const [fullscreen, setFullscreen] = useState(false)
   const [visible, setVisible] = useState(true)
@@ -89,16 +94,17 @@ const BottomNav = () => {
       className={`fixed bottom-0 z-40 left-0 right-0 bg-indigo-800 border-t border-indigo-600 transform transition-transform duration-300 ${!isTouchDevice || visible ? 'translate-y-0' : 'translate-y-full'}`}
     >
       <ul className="flex justify-around items-center h-16">
-        <li>
-          <Link
-            href="/account"
-            onClick={handleInteraction}
-            className="flex flex-col items-center text-indigo-200 hover:text-white cursor-pointer"
-          >
-            <FontAwesomeIcon icon={faUser} size="lg" />
-            <span className="text-xs">Account</span>
-          </Link>
-        </li>
+        {/*Todo add account page*/}
+        {/*<li>*/}
+        {/*  <Link*/}
+        {/*    href="/account"*/}
+        {/*    onClick={handleInteraction}*/}
+        {/*    className="flex flex-col items-center text-indigo-200 hover:text-white cursor-pointer"*/}
+        {/*  >*/}
+        {/*    <FontAwesomeIcon icon={faUser} size="lg" />*/}
+        {/*    <span className="text-xs">Account</span>*/}
+        {/*  </Link>*/}
+        {/*</li>*/}
         <li>
           <Link
             href="/game-engine/game"

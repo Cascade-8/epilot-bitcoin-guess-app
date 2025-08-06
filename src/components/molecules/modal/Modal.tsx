@@ -11,7 +11,6 @@ interface ModalProps {
 }
 
 export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
-  // lock scroll when open
   useEffect(() => {
     if (isOpen) document.body.style.overflow = 'hidden'
     else document.body.style.overflow = ''
@@ -36,8 +35,6 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
           >
             ✕
           </button>
-          {children}
-          {children}
           {children}
         </div>
       </div>

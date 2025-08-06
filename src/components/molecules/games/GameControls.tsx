@@ -1,4 +1,3 @@
-// src/components/molecules/GameControls.tsx
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
@@ -11,7 +10,10 @@ import { ConfettiFailure } from '@/components/molecules/games/ConfettiFailure'
 import { Guess } from '@/app/generated/prisma'
 import { useBitcoinPrices } from '@/context/BitcoinPriceContext'
 
-
+/**
+ * Helper function to format time into a clock like structure (mm:ss)
+ * @param ms time in milliseconds
+ */
 const formatTime = (ms: number) => {
   const totalSec = Math.ceil(ms / 1000)
   const minutes = Math.floor(totalSec / 60)
@@ -19,6 +21,9 @@ const formatTime = (ms: number) => {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
+/**
+ * Control Panel with buttons and triggers for the confetti events
+ */
 export const GameControls: React.FC = () => {
   const { price } = useBitcoinPrices()
 
@@ -50,7 +55,7 @@ export const GameControls: React.FC = () => {
     return () => clearInterval(id)
   }, [currentGuess, period])
 
-  // Triggers on resolution
+  // Confetti Triggers
   useEffect(() => {
     if (prevRecentGuess.current && !currentGuess) {
       const last = history[history.length - 1]
@@ -83,16 +88,18 @@ export const GameControls: React.FC = () => {
   const isCorrect = currentGuess
     ? (currentGuess.type === 'up' ? price! > currentGuess.price : price! < currentGuess.price)
     : false
-  const isUrgent = timeLeft <= 5000
+  const isUrgent = timeLeft <= 5000 // This is when the red pulse starts
   return (
     <>
       <div className="grid grid-cols-4 md:grid-cols-8 gap-6 p-6 pb-3 w-full max-w-6xl mx-auto">
+
         {/* Up Button */}
         <div className="flex justify-center col-span-2 md:col-span-1 md:col-start-3 h-12">
           <GenericButton onClick={() => handleGuess('up')} className={currentGuess?.type === 'up' ? 'disabled:!bg-indigo-700 disabled:!border-cyan-600 disabled:!text-cyan-600':'disabled:!bg-slate-500 disabled:!border-slate-600 disabled:opacity-60 opacity-100'}  disabled={!canGuess}>
             <FontAwesomeIcon icon={faHandPointUp} />
           </GenericButton>
         </div>
+
         {/* Down Button */}
         <div className="flex justify-center col-span-2 md:col-span-1 md:col-start-4 h-12">
           <GenericButton onClick={() => handleGuess('down')} className={currentGuess?.type === 'down' ? 'disabled:!bg-indigo-700 disabled:!border-indigo-900':'disabled:!bg-slate-500 disabled:!border-slate-600 disabled:opacity-60 opacity-100'} disabled={!canGuess}>
@@ -112,7 +119,6 @@ export const GameControls: React.FC = () => {
           ]
             .filter(Boolean)
             .join(' ')}
-          // if there’s a delta, trigger a single pulse
           style={
             lastDelta != null
               ? { animationName: 'pulse', animationDuration: '0.3s', animationIterationCount: 1 }
@@ -138,7 +144,7 @@ export const GameControls: React.FC = () => {
 
         {/* Timer */}
         <div
-          key={timeLeft} // remount each tick
+          key={timeLeft}
           className={[
             'font-orbitron col-span-2 md:col-span-1 flex justify-center items-center h-12 text-xl border-2 rounded-full transition-none',
             'border-indigo-400 bg-indigo-600 text-gray-200',

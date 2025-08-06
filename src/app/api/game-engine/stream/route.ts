@@ -1,4 +1,3 @@
-// app/api/game-engine/stream/route.ts
 import '@/lib/bootstrap'
 import { NextRequest } from 'next/server'
 import { subscribe as subscribePrice } from '@/lib/stores/priceStoreRedis'
@@ -6,6 +5,11 @@ import { subscribeGame }                         from '@/lib/stores/gameStoreRed
 
 export const runtime = 'nodejs'
 
+/**
+ * Event Stream emitter
+ * @param req
+ * @constructor
+ */
 export const GET = async (req: NextRequest) => {
   const url      = new URL(req.url)
   const raw      = url.searchParams.get('channels') ?? ''
@@ -18,7 +22,7 @@ export const GET = async (req: NextRequest) => {
     writer.write(`data: ${JSON.stringify(data)}\n\n`)
   }
 
-  // PRICE:BTC → only live updates (history via separate endpoint)
+  // PRICE:BTC Updates
   let unsubPrice: (() => void) | undefined
   if (channels.has('price:btc')) 
     unsubPrice = subscribePrice(rec =>
@@ -26,7 +30,7 @@ export const GET = async (req: NextRequest) => {
     )
   
 
-  // GAME live-only
+  // GAME Updates
   const gameUnsubs: (() => void)[] = []
   for (const ch of channels) {
     const [kind, gameId, userId] = ch.split(':')

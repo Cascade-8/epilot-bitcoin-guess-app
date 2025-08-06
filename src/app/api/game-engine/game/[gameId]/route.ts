@@ -1,4 +1,4 @@
-// src/app/(protected)/game-engine/game/[gameId]/route.ts
+
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import prisma from '@/lib/services/prisma'
@@ -15,7 +15,7 @@ export const GET = async (
   
   const userId = session.user.id
   const { gameId } = await context.params
-  // fetch the game with its config and per-user states
+
   const game = await prisma.game.findUnique({
     where: { id: gameId },
     include: {
@@ -27,9 +27,7 @@ export const GET = async (
   })
   if (!game) 
     return NextResponse.json({ error: 'Game not found' }, { status: 404 })
-  
 
-  // ensure user is allowed to view: either joined or public/no-passcode
   const isParticipant = game.userStates.some(s => s.userId === userId)
   const isPublic = !game.private && game.passcode === ''
   if (!isParticipant && !isPublic) 

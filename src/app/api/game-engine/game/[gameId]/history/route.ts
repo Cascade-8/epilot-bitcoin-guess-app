@@ -1,4 +1,3 @@
-// src/app/api/game-engine/game/[gameId]/history/route.ts
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/services/prisma'
 import { getServerSession } from 'next-auth/next'
