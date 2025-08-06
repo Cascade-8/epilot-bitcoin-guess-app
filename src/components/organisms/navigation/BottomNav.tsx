@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import { signOut } from 'next-auth/react'
 import { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUser, faGamepad, faCogs, faExpand, faCompress } from '@fortawesome/free-solid-svg-icons'
+import { faUser, faGamepad, faCogs, faExpand, faCompress, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
 
 const BottomNav = () => {
   const [fullscreen, setFullscreen] = useState(false)
@@ -92,7 +93,7 @@ const BottomNav = () => {
           <Link
             href="/account"
             onClick={handleInteraction}
-            className="flex flex-col items-center text-indigo-200 hover:text-white"
+            className="flex flex-col items-center text-indigo-200 hover:text-white cursor-pointer"
           >
             <FontAwesomeIcon icon={faUser} size="lg" />
             <span className="text-xs">Account</span>
@@ -102,7 +103,7 @@ const BottomNav = () => {
           <Link
             href="/game-engine/game"
             onClick={handleInteraction}
-            className="flex flex-col items-center text-indigo-200 hover:text-white"
+            className="flex flex-col items-center text-indigo-200 hover:text-white cursor-pointer"
           >
             <FontAwesomeIcon icon={faGamepad} size="lg" />
             <span className="text-xs">Games</span>
@@ -112,7 +113,7 @@ const BottomNav = () => {
           <Link
             href="/game-engine/config"
             onClick={handleInteraction}
-            className="flex flex-col items-center text-indigo-200 hover:text-white"
+            className="flex flex-col items-center text-indigo-200 hover:text-white cursor-pointer"
           >
             <FontAwesomeIcon icon={faCogs} size="lg" />
             <span className="text-xs">Configs</span>
@@ -125,10 +126,23 @@ const BottomNav = () => {
               toggleFullscreen()
               handleInteraction()
             }}
-            className="flex flex-col items-center text-indigo-200 hover:text-white focus:outline-none"
+            className="flex flex-col items-center text-indigo-200 hover:text-white focus:outline-none cursor-pointer"
           >
             <FontAwesomeIcon icon={fullscreen ? faCompress : faExpand} size="lg" />
             <span className="text-xs">Fullscreen</span>
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
+            onClick={() => {
+              signOut({ callbackUrl: '/' } )
+              handleInteraction()
+            }}
+            className="flex flex-col items-center text-indigo-200 hover:text-white focus:outline-none cursor-pointer"
+          >
+            <FontAwesomeIcon icon={faSignOutAlt} size="lg" />
+            <span className="text-xs">Logout</span>
           </button>
         </li>
       </ul>
