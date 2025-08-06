@@ -39,7 +39,6 @@ const GameDetailPage: React.FC<Props> = (props) => {
   if (error || !game) 
     return <p className="p-8 text-red-400">{error || 'Unknown error'}</p>
 
-  console.log(game)
   return (
     <SessionProvider><GamePage game={game}></GamePage></SessionProvider>
   )

@@ -25,7 +25,6 @@ export const GET = async (
       },
     },
   })
-  console.log(game)
   if (!game) 
     return NextResponse.json({ error: 'Game not found' }, { status: 404 })
   

@@ -53,10 +53,8 @@ export const GameControls: React.FC = () => {
 
   // Triggers on resolution
   useEffect(() => {
-    console.log(currentGuess)
     if (prevRecentGuess.current && !currentGuess) {
       const last = history[history.length - 1]
-      console.log(last)
       const delta = last.outcome ? 1 : -1
       setLastDelta(delta)
 
