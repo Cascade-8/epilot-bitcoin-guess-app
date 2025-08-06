@@ -32,7 +32,7 @@ type ProviderProps = {
   game: Game & { gameConfig: GameConfig }
 }
 
-export const GameProvider: React.FC<ProviderProps> = ({ children, game }) => {
+const GameProvider: React.FC<ProviderProps> = ({ children, game }) => {
   const { data: session } = useSession()
   const userId = session?.user?.id
   const gameId = game.id
@@ -54,54 +54,54 @@ export const GameProvider: React.FC<ProviderProps> = ({ children, game }) => {
       .then((g: { userStates: UserState[] }) => setUserStates(g.userStates))
   }, [gameId])
 
-  // Build WS URL dynamically
-  const makeSocketUrl = (channels: string) => {
-    if (typeof window === 'undefined') return ''
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
-    // replace port 3000 -> 3001 (adjust if different)
-    const host = window.location.host.replace(/:3000$/, ':3001')
-    return `${protocol}://${host}/?channels=${channels}`
-  }
-
-  // Subscribe to game updates
+  // Subscribe to live game updates via SSE
   useEffect(() => {
     if (!userId) return
     const channel = `game:${gameId}:${userId}`
-    const url = makeSocketUrl(channel)
-    const ws = new WebSocket(url)
-    const hist = history
-    const curr = currentGuess
+    const origin  = typeof window !== 'undefined'
+      ? window.location.origin
+      : ''
+    const streamUrl = `${origin}/api/game-engine/stream?channels=${channel}`
+    const es = new EventSource(streamUrl)
 
-    ws.onmessage = ({ data }) => {
-      const msg = JSON.parse(data) as {
-        channel: string
-        event: 'guess' | 'state'
-        data: any
-      }
-      if (msg.channel !== channel) return
-
-      if (msg.event === 'guess') {
-        const g: Guess = msg.data
-        if (g.outcome === null) 
-          setCurrentGuess(g)
-        else if (curr?.id === g.id) {
-          setHistory([...hist, g])
-          setCurrentGuess(undefined)
+    es.onmessage = e => {
+      try {
+        const msg = JSON.parse(e.data) as {
+          channel: string
+          type: 'update'
+          event: 'guess' | 'state'
+          data: any
+          time: number
         }
-      }
-
-      if (msg.event === 'state') {
-        const us: UserState = msg.data
-        setUserStates(s => {
-          const others = s.filter(x => x.userId !== us.userId)
-          return [...others, us]
-        })
+        if (msg.channel !== channel) return
+        if (msg.event === 'guess') {
+          const g = msg.data as Guess
+          if (g.outcome === null) 
+            setCurrentGuess(g)
+          else {
+            setHistory(prev => [...prev, g])
+            setCurrentGuess(undefined)
+          }
+        } else if (msg.event === 'state') {
+          const us = msg.data as UserState
+          setUserStates(prev => {
+            const others = prev.filter(x => x.userId !== us.userId)
+            return [...others, us]
+          })
+        }
+      } catch (err) {
+        console.error('[SSE] parse error', err)
       }
     }
 
-    ws.onerror = console.error
-    return () => ws.close()
-  }, [gameId, userId, history, currentGuess])
+    es.onerror = err => {
+      console.error('[SSE] error', err)
+    }
+
+    return () => {
+      es.close()
+    }
+  }, [gameId, userId])
 
   const placeGuess = async (guessReq: GuessRequest) => {
     await fetch(`/api/game-engine/game/${gameId}/guess`, {
@@ -121,3 +121,5 @@ export const GameProvider: React.FC<ProviderProps> = ({ children, game }) => {
     </GameContext.Provider>
   )
 }
+
+export { GameProvider }

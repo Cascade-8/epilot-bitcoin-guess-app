@@ -8,8 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHandPointUp } from '@fortawesome/free-regular-svg-icons'
 import { ConfettiSuccess } from '@/components/molecules/ConfettiSuccess'
 import { ConfettiFailure } from '@/components/molecules/ConfettiFailure'
-import { useBitcoinSocket } from '@/hooks/useBitcoinSocket'
 import { Guess } from '@/app/generated/prisma'
+import { useBitcoinPrices } from '@/context/BitcoinPriceContext'
 
 
 const formatTime = (ms: number) => {
@@ -20,8 +20,7 @@ const formatTime = (ms: number) => {
 }
 
 export const GameControls: React.FC = () => {
-  const prices = useBitcoinSocket()
-  const price = prices[prices.length - 1]?.price ?? null
+  const { price } = useBitcoinPrices()
 
   const { history, userState, placeGuess, game, currentGuess } = useGame()
 

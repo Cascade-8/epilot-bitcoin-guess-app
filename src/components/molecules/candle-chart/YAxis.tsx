@@ -16,7 +16,7 @@ const YAxisGrid: FunctionComponent<YAxisGridProps> = ({ yScale, yTicks, innerW }
           <text x={-4} y={y} textAnchor="end" dominantBaseline="middle" className="fill-indigo-300">
             ${v.toFixed(2)}
           </text>
-          <line x1={0} x2={innerW} y1={y} y2={y} strokeDasharray="1 3" className="stroke-indigo-300" />
+          <line x1={0} x2={innerW} y1={y} y2={y} strokeDasharray="0.5 1" className="stroke-indigo-300" />
         </g>
       )
     })}
@@ -32,7 +32,7 @@ const VerticalGrid: FunctionComponent<VerticalGridProps> = ({ candles, xScale, i
   <>
     {candles.map((c, i) => {
       const xCenter = (xScale(c.timestamp.toString()) ?? 0) + xScale.bandwidth() / 2
-      return <line key={i} x1={xCenter} x2={xCenter} y1={0} y2={innerH} strokeDasharray="0.5 3" className="stroke-indigo-300" />
+      return <line key={i} x1={xCenter} x2={xCenter} y1={0} y2={innerH} strokeDasharray="0.2 1" className="stroke-indigo-300" />
     })}
   </>
 )

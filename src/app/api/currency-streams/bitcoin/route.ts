@@ -1,7 +1,7 @@
-import { getHistory } from '@/lib/BitcoinPriceStore'
-import '@/lib/BitcoinPriceStore'
-import '@/lib/GameInfoSocket'
-import { NextResponse } from 'next/server'   // ← this import causes the WS to start
-export const GET = () => {
-  return NextResponse.json(getHistory())
+import { NextResponse } from 'next/server'
+import { getHistory }   from '@/lib/priceStoreRedis'
+
+export const GET = async () => {
+  const hist = await getHistory()
+  return NextResponse.json(hist)
 }

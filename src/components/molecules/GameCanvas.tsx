@@ -14,8 +14,9 @@ const GameCanvas: FC = () => {
           config={{
             labelLeftArea: 55,
             labelRightArea: 50,
-            displayBuckets: 20,
-            displayLabels: 4
+            displayBuckets: 40,
+            displayLabels: 4,
+            maxCandleWidth: 10
           }}
         />
       </div>

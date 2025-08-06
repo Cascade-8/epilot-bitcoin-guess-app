@@ -153,7 +153,7 @@ export const CandleChart: FunctionComponent<CandleChartProps> = ({
                   currentGuess.type === 'up' ? '↗️' : '↘️'
                 } `}
                 strokeClass="stroke-yellow-400"
-                fillClass="fill-yellow-400 text-[10px] lg:text-xs"
+                fillClass="fill-yellow-4How do i 00 text-[6px] lg:text-xs"
                 dashArray="2 4"
               />
             )}
