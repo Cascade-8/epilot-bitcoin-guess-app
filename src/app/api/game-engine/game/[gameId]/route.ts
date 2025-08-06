@@ -15,7 +15,6 @@ export const GET = async (
   
   const userId = session.user.id
   const { gameId } = await params
-
   // fetch the game with its config and per-user states
   const game = await prisma.game.findUnique({
     where: { id: gameId },
@@ -26,7 +25,7 @@ export const GET = async (
       },
     },
   })
-
+  console.log(game)
   if (!game) 
     return NextResponse.json({ error: 'Game not found' }, { status: 404 })
   

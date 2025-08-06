@@ -2,6 +2,8 @@ import { ReactNode } from 'react'
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { BottomNav } from '@/components/organisms/navigation/BottomNav'
+import { ToastProvider } from '@/context/ToastContextProvider'
 
 type Props = { children: ReactNode }
 
@@ -16,9 +18,12 @@ export default async function ProtectedLayout({ children }: Props) {
 
   // otherwise render the protected UI
   return (
-    <div className="min-h-screen flex flex-col bg-indigo-900">
-      {/* you can put a header/nav here */}
-      <main className="flex-1">{children}</main>
-    </div>
+    <ToastProvider>
+      <div className="min-h-screen flex flex-col bg-indigo-900">
+        {/* you can put a header/nav here */}
+        <BottomNav></BottomNav>
+        <main className="flex-1">{children}</main>
+      </div>
+    </ToastProvider>
   )
 }

@@ -12,11 +12,11 @@ type GamePageProps = {
   }
 }
 
-const GamePage = ({ children, game }: GamePageProps) => {
+const GamePage = ({ game }: GamePageProps) => {
   return (
     <BitcoinPriceProvider>
       <GameProvider game={game}>
-        <div className="absolute inset-0 flex items-center justify-center p-4">
+        <div className="absolute inset-0 flex items-center justify-center p-4 sm:mb-16">
           <GameCanvas />
         </div>
       </GameProvider>

@@ -10,7 +10,7 @@ interface Particle {
   emoji: string
 }
 
-export const ConfettiFailure: React.FC<{ trigger: boolean }> = ({ trigger }) => {
+export const ConfettiFailure: React.FC<{ trigger: boolean, emojis: string[] }> = ({ trigger, emojis }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animRef = useRef<number | null>(null)
   const particlesRef = useRef<Particle[]>([])
@@ -31,14 +31,14 @@ export const ConfettiFailure: React.FC<{ trigger: boolean }> = ({ trigger }) => 
     const H = canvas.height
 
     const gravity = 0.2
-    const reactions = ['💀', '☠️', '💩']
+
 
     particlesRef.current = Array.from({ length: 100 }).map(() => ({
       x: Math.random() * W,
       y: -Math.random() * 750,
       vy: 2 + Math.random() * 2,
       size: 20 + Math.random() * 75,
-      emoji: reactions[Math.floor(Math.random() * reactions.length)],
+      emoji: emojis[Math.floor(Math.random() * emojis.length)],
     }))
 
     const draw = () => {

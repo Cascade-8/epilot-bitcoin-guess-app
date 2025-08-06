@@ -1,4 +1,6 @@
 // src/hooks/useBitcoinSocket.ts
+'use client'
+
 import { useEffect, useState, useRef } from 'react'
 
 export type PricePoint = { time: number; price: number }
@@ -9,18 +11,31 @@ export const useBitcoinSocket = (bufferMs = 10 * 60 * 1000) => {
   const retryRef = useRef(0)
   const timeoutRef = useRef<number | null>(null)
 
+  // Build ws:// or wss:// URL on the fly
+  const getSocketUrl = () => {
+    if (typeof window === 'undefined') return ''
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
+    // replace the front-end port with your WS port if different
+    const host = window.location.host.replace(/:3000$/, ':3001')
+    return `${protocol}://${host}/?channels=price:btc`
+  }
+
   const connect = () => {
-    // avoid creating a new socket if one is already alive
     const existing = wsRef.current
-    if (existing && (existing.readyState === WebSocket.CONNECTING || existing.readyState === WebSocket.OPEN))
+    if (
+      existing &&
+      (existing.readyState === WebSocket.CONNECTING ||
+        existing.readyState === WebSocket.OPEN)
+    ) 
       return
+    
 
-
-    const socket = new WebSocket('ws://localhost:3001')
+    const url = getSocketUrl()
+    const socket = new WebSocket(url)
     wsRef.current = socket
 
     socket.onopen = () => {
-      console.log('[WS] connected')
+      console.log(`[WS] connected to price:btc @ ${url}`)
       retryRef.current = 0
       if (timeoutRef.current !== null) {
         clearTimeout(timeoutRef.current)
@@ -30,22 +45,31 @@ export const useBitcoinSocket = (bufferMs = 10 * 60 * 1000) => {
 
     socket.onmessage = (evt) => {
       try {
-        const msg = JSON.parse(evt.data) as PricePoint & { type: string }
+        const msg = JSON.parse(evt.data) as {
+          channel: string
+          type: 'price' | 'history'
+          time: number
+          price: number
+        }
+        if (msg.channel !== 'price:btc') return
+
         setPrices(prev => {
-          const merged = [...prev, { time: msg.time, price: msg.price }]
           const cutoff = Date.now() - bufferMs
+          const merged = [...prev, { time: msg.time, price: msg.price }]
           return merged.filter(p => p.time >= cutoff)
         })
-      } catch {}
+      } catch (err) {
+        console.error('[WS] message parse error', err)
+      }
     }
 
-    // remove or noop onerror so we don't double-trigger reconnect
-    socket.onerror = () => {
-      // console.warn('[WS] error (ignored), waiting for onclose')
+    socket.onerror = (err) => {
+      console.warn('[WS] error', err)
+      // let onclose handle reconnect
     }
 
     socket.onclose = () => {
-      // console.warn('[WS] disconnected, retrying…')
+      console.log('[WS] closed — retrying')
       if (timeoutRef.current === null) {
         const delay = Math.min(10000, 1000 * 2 ** retryRef.current)
         retryRef.current += 1
@@ -58,9 +82,7 @@ export const useBitcoinSocket = (bufferMs = 10 * 60 * 1000) => {
     connect()
     return () => {
       wsRef.current?.close()
-      if (timeoutRef.current !== null)
-        clearTimeout(timeoutRef.current)
-
+      if (timeoutRef.current !== null) clearTimeout(timeoutRef.current)
     }
   }, [bufferMs])
 

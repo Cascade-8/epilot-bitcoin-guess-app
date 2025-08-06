@@ -26,6 +26,11 @@ export const getHistory = (): PriceRecord[] => {
   return prices
 }
 
+export const getPrice = () => {
+  prune()
+  return prices[prices.length - 1]?.price ?? null
+}
+
 export const subscribe = (fn: (rec: PriceRecord) => void) => {
   emitter.on('price', fn)
   return () => emitter.off('price', fn)

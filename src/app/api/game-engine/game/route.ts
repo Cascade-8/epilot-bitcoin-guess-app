@@ -1,11 +1,10 @@
-// src/app/(protected)/game-engine/game/route.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import prisma from '@/lib/prisma'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { getServerSession } from 'next-auth/next'
 
-export const GET = async (req: NextRequest) => {
+export const GET = async () => {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id
 
@@ -83,4 +82,63 @@ export const PATCH = async (req: NextRequest) => {
   })
 
   return NextResponse.json(updatedGame)
+}
+
+export const POST = async (req: Request) => {
+  // 1) authentication
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) 
+    return NextResponse.json(
+      { error: 'Not authenticated' },
+      { status: 401 }
+    )
+  
+  const userId = session.user.id
+
+  // 2) parse & validate
+  const { name, configId, isPrivate = false, passcode } =
+    (await req.json()) as {
+      name: string
+      configId: string
+      isPrivate?: boolean
+      passcode?: string
+    }
+
+  if (!name?.trim()) 
+    return NextResponse.json(
+      { error: 'Game name is required' },
+      { status: 400 }
+    )
+  
+  if (!configId) 
+    return NextResponse.json(
+      { error: 'Config ID is required' },
+      { status: 400 }
+    )
+  
+
+  // 3) ensure config exists
+  const cfg = await prisma.gameConfig.findUnique({
+    where: { id: configId },
+  })
+  if (!cfg) 
+    return NextResponse.json(
+      { error: 'Invalid config' },
+      { status: 400 }
+    )
+  
+
+  // 4) create game + initial userState (join creator)
+  const game = await prisma.game.create({
+    data: {
+      name: name.trim(),
+      configId,
+      private: isPrivate,
+      passcode: isPrivate ? passcode || '' : '',
+      userStates: {
+        create: { userId },
+      },
+    },
+  })
+  return NextResponse.json(game, { status: 201 })
 }

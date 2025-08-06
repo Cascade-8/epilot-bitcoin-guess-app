@@ -23,7 +23,7 @@ const Home: React.FC = () => {
     if (res?.error) 
       setError(res.error)
     else 
-      router.push('/game')
+      router.push('/game-engine/config')
     
   }
 
@@ -54,7 +54,7 @@ const Home: React.FC = () => {
     if (signInResult?.error) 
       setError(signInResult.error)
     else 
-      router.push('/game')   // or router.push('/') to go to your dashboard
+      router.push('/game-engine/config')   // or router.push('/') to go to your dashboard
     
   }
 

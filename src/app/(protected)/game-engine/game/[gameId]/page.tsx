@@ -24,14 +24,10 @@ const GameDetailPage: React.FC<Props> = (props) => {
 
   useEffect(() => {
     setLoading(true)
-    fetch(`/api/game-engine/game?gameId=${gameId}`)
+    fetch(`/api/game-engine/game/${gameId}`)
       .then(res => res.json())
-      .then((data: EnhancedGame[]) => {
-        if (Array.isArray(data) && data.length > 0) 
-          setGame(data[0])
-        else 
-          setError('Game not found')
-        
+      .then((data: EnhancedGame) => {
+        setGame(data)
       })
       .catch(() => setError('Failed to load game'))
       .finally(() => setLoading(false))
@@ -43,7 +39,7 @@ const GameDetailPage: React.FC<Props> = (props) => {
   if (error || !game) 
     return <p className="p-8 text-red-400">{error || 'Unknown error'}</p>
 
-
+  console.log(game)
   return (
     <SessionProvider><GamePage game={game}></GamePage></SessionProvider>
   )

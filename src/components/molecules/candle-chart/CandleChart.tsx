@@ -40,10 +40,9 @@ export const CandleChart: FunctionComponent<CandleChartProps> = ({
   config = {},
 }) => {
   const { recentPrices, price: currentPrice } = useBitcoinPrices()
-  const { recentGuess } = useGame()
+  const { currentGuess } = useGame()
   const ref = useRef<HTMLDivElement>(null)
   const [{ width, height }, setSize] = useState({ width: 0, height: 0 })
-
   useLayoutEffect(() => {
     if (!ref.current) return
     const observer = new ResizeObserver(([entry]) => {
@@ -121,7 +120,7 @@ export const CandleChart: FunctionComponent<CandleChartProps> = ({
   )
 
   const yCurrent = yScale(currentPrice ?? 0)
-  const yGuess = recentGuess ? yScale(recentGuess.price) : null
+  const yGuess = currentGuess ? yScale(currentGuess.price) : null
 
   return (
     <div
@@ -145,13 +144,13 @@ export const CandleChart: FunctionComponent<CandleChartProps> = ({
               fillClass="fill-cyan-400"
               dashArray="4 4"
             />
-            {recentGuess && (
+            {currentGuess && (
               <PriceLine
                 yPosition={yGuess!}
                 innerW={innerW}
                 labelSide={'left'}
-                label={`$${recentGuess.price.toFixed(2)} ${
-                  recentGuess.type === 'up' ? '↗️' : '↘️'
+                label={`$${currentGuess.price.toFixed(2)} ${
+                  currentGuess.type === 'up' ? '↗️' : '↘️'
                 } `}
                 strokeClass="stroke-yellow-400"
                 fillClass="fill-yellow-400 text-[10px] lg:text-xs"

@@ -16,7 +16,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       // <-- Note the two parameters here
-      authorize: async (creds, req) => {
+      authorize: async (creds) => {
         if (!creds?.username || !creds?.password) return null
 
         const user = await prisma.user.findUnique({
@@ -49,7 +49,7 @@ export const authOptions: NextAuthOptions = {
       return session
     },
   },
-  pages: { signIn: '/', error: '/' },
+  pages: { signIn: '/game-engine/config', error: '/' },
   secret: process.env.NEXTAUTH_SECRET,
 }
 

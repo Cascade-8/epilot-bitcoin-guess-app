@@ -2,9 +2,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Game, GameConfig, User, UserState } from '@/app/generated/prisma'
+import { Game, GameConfig, UserState } from '@/app/generated/prisma'
 import { GameCard } from '@/components/molecules/games/GameCard'
 import { SessionProvider } from 'next-auth/react'
+import { GenericButton } from '@/components/atoms/buttons/GenericButton'
+import Link from 'next/link'
 
 type EnhancedGame = Game & {
   userStates: UserState[]
@@ -28,19 +30,24 @@ export default function GamesPage() {
   }, [])
 
   return (
-    <main className="p-8 max-w-6xl mx-auto space-y-8">
-      <h1 className="text-3xl font-semibold text-white">Games</h1>
+    <main className="p-8 max-w-7xl mx-auto space-y-8">
+      <h1 className="text-3xl font-semibold text-white flex justify-between items-center">Games<Link href={'/game-engine/game/new'} className={'h-10 w-32'}><GenericButton>Create Game</GenericButton></Link></h1>
 
       {loading && <p className="text-indigo-200">Loading games…</p>}
       {error && <p className="text-red-400">{error}</p>}
 
       {!loading && !error && (
         <>
-          <section className="space-y-6 flex items-start justify-start flex-wrap w-full gap-6">
+          <section className={['grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+            'gap-6 place-items-center w-full max-w-7xl mx-auto py-6'].join(' ')}>
             {games.length === 0 ? (
               <p className="text-indigo-200">No open games available.</p>
             ) : (
-              games.map(game => <SessionProvider  key={game.id}><GameCard game={game} /></SessionProvider>)
+              games.map(game => (
+                <SessionProvider key={game.id}>
+                  <GameCard game={game} />
+                </SessionProvider>
+              ))
             )}
           </section>
         </>

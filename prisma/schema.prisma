@@ -58,14 +58,15 @@ model VerificationToken {
 }
 
 model GameConfig {
-  id                    String  @id @default(cuid())
+  id                    String   @id @default(cuid())
   name                  String
   guessingPeriod        Int // in ms, min 5000
-  scoreStreaksEnabled   Boolean @default(false)
+  scoreStreaksEnabled   Boolean  @default(false)
   scoreStreakThresholds String? // e.g. "1:1;2:3" or "f(n;n*n)"
-  bettingMode           Boolean @default(false)
-  maxPlayers            Int     @default(0)
-  duration              Int?    @default(0) // ms, >= guessingPeriod + 60000; null = infinite
+  bettingMode           Boolean  @default(false)
+  maxPlayers            Int      @default(0)
+  duration              Int?     @default(0) // ms, >= guessingPeriod + 60000; null = infinite
+  isPublic              Boolean? @default(false)
 
   games  Game[]  @relation("ConfigGames")
   userId String? // if not set, it's a default config

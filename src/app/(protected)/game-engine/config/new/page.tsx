@@ -1,14 +1,15 @@
-// src/app/(protected)/game/config/new/page.tsx
 'use client'
 
-import { useState, useMemo, FormEvent } from 'react'
+import React, { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { TextInput, NumberInput } from '@/components/atoms/input/GenericInput'
 import { GenericButton } from '@/components/atoms/buttons/GenericButton'
 import { ScoreStreakThresholdInput } from '@/components/molecules/ScoreStreakThresholdInput'
+import { useToast } from '@/context/ToastContextProvider'
 
 export default function NewConfigPage() {
   const router = useRouter()
+  const { addToast } = useToast()
   const [form, setForm] = useState({
     name: '',
     guessingPeriod: 5000,
@@ -24,29 +25,31 @@ export default function NewConfigPage() {
   const handleChange = <K extends keyof typeof form>(
     key: K,
     value: typeof form[K]
-  ) => {
-    setForm(f => ({ ...f, [key]: value }))
-  }
+  ) => setForm(f => ({ ...f, [key]: value }))
 
-  // --- Submit ---
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError(null)
     setLoading(true)
     try {
-      const res = await fetch('/api/game/config', {
+      const res = await fetch('/api/game-engine/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
       const json = await res.json()
-      if (!res.ok)
-        setError(json.error || 'Failed to create config')
-      else
-        router.push(`/game/config/${json.id}/edit`)
-
+      if (!res.ok) {
+        const msg = json.error || 'Failed to create config'
+        setError(msg)
+        addToast(`Error: ${msg}`, 'error')
+      } else {
+        addToast('Config created successfully', 'success')
+        router.push(`/game-engine/config/${json.id}`)
+      }
     } catch (e: any) {
-      setError(e.message)
+      const msg = e.message || 'Network error'
+      setError(msg)
+      addToast(`Error: ${msg}`, 'error')
     } finally {
       setLoading(false)
     }
@@ -55,10 +58,7 @@ export default function NewConfigPage() {
   return (
     <main className="p-8 max-w-xl mx-auto space-y-6">
       <h1 className="text-3xl font-semibold text-white">New Game Config</h1>
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-4 bg-indigo-800 p-6 rounded"
-      >
+      <form onSubmit={handleSubmit} className="space-y-4 bg-indigo-800 p-6 rounded">
         <TextInput
           label="Config Name"
           value={form.name}
@@ -73,11 +73,7 @@ export default function NewConfigPage() {
           setValue={v => handleChange('guessingPeriod', Number(v))}
           min={5000}
           step={1000}
-          hint={
-            form.guessingPeriod < 5000
-              ? 'Must be ≥ 5000ms'
-              : undefined
-          }
+          hint={form.guessingPeriod < 5000 ? 'Must be ≥ 5000ms' : undefined}
           hintColorClass="text-yellow-300"
         />
 
@@ -85,9 +81,7 @@ export default function NewConfigPage() {
           <input
             type="checkbox"
             checked={form.scoreStreaksEnabled}
-            onChange={e =>
-              handleChange('scoreStreaksEnabled', e.target.checked)
-            }
+            onChange={e => handleChange('scoreStreaksEnabled', e.target.checked)}
             className="accent-cyan-400"
           />
           <span>Enable Score Streaks</span>
@@ -114,9 +108,9 @@ export default function NewConfigPage() {
           label="Max Players"
           value={String(form.maxPlayers)}
           setValue={v => handleChange('maxPlayers', Number(v))}
-          min={1}
+          min={0}
           step={1}
-          hint={'0 = infinite players'}
+          hint="0 = infinite players"
           hintColorClass="text-slate-400"
         />
 
@@ -127,12 +121,11 @@ export default function NewConfigPage() {
           min={0}
           step={1000}
           hint={
-            form.duration !== 0 ?
-              form.duration < form.guessingPeriod + 60000
+            form.duration !== 0
+              ? form.duration < form.guessingPeriod + 60000
                 ? 'Must be ≥ period + 60000ms'
                 : undefined
-              :
-              '0 = infinite time'
+              : '0 = infinite time'
           }
           hintColorClass="text-yellow-300"
         />
