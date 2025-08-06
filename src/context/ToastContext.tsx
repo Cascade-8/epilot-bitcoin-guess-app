@@ -65,12 +65,11 @@ const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       <div className="fixed bottom-20 inset-x-0 px-4 flex flex-col items-center space-y-2 z-50">
         {toasts.map(t => {
           const { bg, text, icon } = getToastConfig(t.type)
-          const cls = t.exiting ? 'toast-exit' : 'toast-enter'
           return (
             <div
               key={t.id}
               className={
-                `w-full sm:w-72 ${bg} px-4 py-2 rounded shadow-lg flex items-center space-x-2 ${cls}`
+                `w-full sm:w-72 ${bg} px-4 py-2 rounded shadow-lg flex items-center space-x-2 ${t.exiting ? 'toast-exit' : 'toast-enter'}`
               }
             >
               <FontAwesomeIcon icon={icon} className={`${text} flex-shrink-0`} />

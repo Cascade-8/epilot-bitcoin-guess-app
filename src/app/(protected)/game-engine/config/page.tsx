@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { getServerSession } from 'next-auth/next'
 import prisma from '@/lib/services/prisma'
 import { GenericButton } from '@/components/atoms/buttons/GenericButton'
-import { GameConfigLine } from '@/app/(protected)/game-engine/config/_components/GameConfigLine'
+import { GameConfigLine } from '@/components/molecules/games/GameConfigLine'
 import { authOptions } from '@/lib/auth'
 
 export default async function ConfigOverviewPage() {

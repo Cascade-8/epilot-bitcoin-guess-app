@@ -10,7 +10,7 @@ import { PageSpinner } from '@/components/atoms/spinner/LogoSpinner'
 
 import { GameConfig } from '@/app/generated/prisma'
 import { Modal } from '@/components/molecules/modal/Modal'
-import { GameConfigLine } from '@/app/(protected)/game-engine/config/_components/GameConfigLine'
+import { GameConfigLine } from '@/components/molecules/games/GameConfigLine'
 
 
 const CreateGamePage: React.FC = () => {
