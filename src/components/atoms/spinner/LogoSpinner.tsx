@@ -5,7 +5,7 @@ const LogoSpinner: React.FC = () => (
   <div className="fixed inset-0 flex items-center justify-center bg-indigo-900 bg-opacity-50 z-50">
     <div className="w-24 h-24 animate-spin">
       <Image
-        src="/Cascade.png"
+        src="/cascade.png"
         alt="Loading…"
         width={96}
         height={96}
