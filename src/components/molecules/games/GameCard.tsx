@@ -59,7 +59,7 @@ const GameCard = ({ game }: GameCardProps) => {
           Players: {game.userStates.length} /{' '}
           {game.gameConfig.maxPlayers > 0
             ? game.gameConfig.maxPlayers
-            : <span className="font-mono text-2xl align-middle mr-2">∞</span>}
+            : <span className="font-mono font-bold align-middle mr-2">∞</span>}
         </p>
         <p className="text-sm text-indigo-200 font-mono mt-1">
           Score: {userState?.score || ''}
