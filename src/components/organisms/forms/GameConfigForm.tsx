@@ -3,7 +3,7 @@
 import React, { useState, FormEvent } from 'react'
 import { TextInput, NumberInput } from '@/components/atoms/input/GenericInput'
 import { GenericButton } from '@/components/atoms/buttons/GenericButton'
-import { ScoreStreakThresholdInput } from '@/components/molecules/ScoreStreakThresholdInput'
+import { ScoreStreakThresholdInput } from '@/components/organisms/forms/ScoreStreakThresholdInput'
 
 export interface GameConfig {
   name: string

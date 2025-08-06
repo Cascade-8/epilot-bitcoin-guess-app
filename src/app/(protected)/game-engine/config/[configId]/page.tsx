@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { GameConfigForm, GameConfig } from '@/components/organisms/forms/GameConfigForm'
 import { GenericButton } from '@/components/atoms/buttons/GenericButton'
-import { useToast } from '@/context/ToastContextProvider'
+import { useToast } from '@/context/ToastContext'
 import { PageSpinner } from '@/components/atoms/spinner/LogoSpinner'
 
 export default function ConfigPage() {

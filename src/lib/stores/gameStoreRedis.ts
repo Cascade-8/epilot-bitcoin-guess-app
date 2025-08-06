@@ -1,6 +1,6 @@
 // src/lib/gameStoreRedis.ts
 import Redis from 'ioredis'
-import { redis } from './redisClient'
+import { redis } from '../services/redisClient'
 
 type GameEvent = {
   event: string

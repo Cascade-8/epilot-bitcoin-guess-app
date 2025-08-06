@@ -1,8 +1,8 @@
 import { FC } from 'react'
 
 import { CandleChart } from '@/components/molecules/candle-chart/CandleChart'
-import { PriceDisplay } from '@/components/molecules/PriceDisplay'
-import { GameControls } from '@/components/molecules/GameControls'
+import { PriceDisplay } from '@/components/molecules/games/PriceDisplay'
+import { GameControls } from '@/components/molecules/games/GameControls'
 
 const GameCanvas: FC = () => {
   return (

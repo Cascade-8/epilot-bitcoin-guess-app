@@ -3,8 +3,10 @@
 
 import React, { useEffect, useState } from 'react'
 import { Game, GameConfig, User } from '@/app/generated/prisma'
-import { GamePage } from '@/components/pages/GamePage'
 import { SessionProvider } from 'next-auth/react'
+import { BitcoinPriceProvider } from '@/context/BitcoinPriceContext'
+import { GameProvider } from '@/context/GameContext'
+import { GameCanvas } from '@/components/molecules/games/GameCanvas'
 
 type EnhancedGame = Game & {
   users: User[]
@@ -40,7 +42,15 @@ const GameDetailPage: React.FC<Props> = (props) => {
     return <p className="p-8 text-red-400">{error || 'Unknown error'}</p>
 
   return (
-    <SessionProvider><GamePage game={game}></GamePage></SessionProvider>
+    <SessionProvider>
+      <BitcoinPriceProvider>
+        <GameProvider game={game}>
+          <div className="absolute inset-0 flex items-center justify-center p-4 sm:mb-16">
+            <GameCanvas />
+          </div>
+        </GameProvider>
+      </BitcoinPriceProvider>
+    </SessionProvider>
   )
 }
 

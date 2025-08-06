@@ -1,11 +1,11 @@
 // src/app/(protected)/game-engine/game/[gameId]/guess/route.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import prisma from '@/lib/prisma'
+import prisma from '@/lib/services/prisma'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { addGameEvent } from '@/lib/gameStoreRedis'
-import { redis } from '@/lib/redisClient'
+import { addGameEvent } from '@/lib/stores/gameStoreRedis'
+import { redis } from '@/lib/services/redisClient'
 
 export const POST = async (
   req: NextRequest,

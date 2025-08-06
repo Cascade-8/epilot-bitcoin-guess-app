@@ -1,6 +1,6 @@
 // src/lib/priceStoreRedis.ts
 import Redis from 'ioredis'
-import { redis } from './redisClient'
+import { redis } from '../services/redisClient'
 
 type PriceRecord = { time: number; price: number }
 

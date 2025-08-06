@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import prisma from '@/lib/prisma'
+import prisma from '@/lib/services/prisma'
 
 const MIN_GUESSING_PERIOD = 5000
 const MIN_DURATION_OFFSET = 60000

@@ -4,8 +4,8 @@ import React, { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { TextInput, NumberInput } from '@/components/atoms/input/GenericInput'
 import { GenericButton } from '@/components/atoms/buttons/GenericButton'
-import { ScoreStreakThresholdInput } from '@/components/molecules/ScoreStreakThresholdInput'
-import { useToast } from '@/context/ToastContextProvider'
+import { ScoreStreakThresholdInput } from '@/components/organisms/forms/ScoreStreakThresholdInput'
+import { useToast } from '@/context/ToastContext'
 
 export default function NewConfigPage() {
   const router = useRouter()

@@ -5,7 +5,7 @@ import React, { useState, useEffect, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { TextInput } from '@/components/atoms/input/GenericInput'
 import { GenericButton } from '@/components/atoms/buttons/GenericButton'
-import { useToast } from '@/context/ToastContextProvider'
+import { useToast } from '@/context/ToastContext'
 import { PageSpinner } from '@/components/atoms/spinner/LogoSpinner'
 
 import { GameConfig } from '@/app/generated/prisma'

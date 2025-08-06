@@ -1,5 +1,5 @@
 import WebSocket from 'ws'
-import { addPrice } from '@/lib/priceStoreRedis'
+import { addPrice } from '@/lib/stores/priceStoreRedis'
 
 const binanceWs = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@aggTrade')
 

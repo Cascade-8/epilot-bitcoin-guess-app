@@ -1,19 +1,14 @@
 // src/components/atoms/PriceDisplay.tsx
 'use client'
 
-import { ReactNode, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowUpRightDots } from '@fortawesome/free-solid-svg-icons'
 import { useBitcoinPrices } from '@/context/BitcoinPriceContext'
 
-type PriceDisplayProps = {
-  children?: ReactNode
-}
-
 const PRICE_BUFFER_LENGTH = 10
-
-export const PriceDisplay = ({ children }: PriceDisplayProps) => {
-  const { recentPrices, price } = useBitcoinPrices()
+export const PriceDisplay = () => {
+  const { recentPrices } = useBitcoinPrices()
   const [trendDirection, setTrendDirection] = useState<'up' | 'down' | null>(null)
 
   useEffect(() => {

@@ -1,8 +1,8 @@
 // src/guessResolutionWorker.ts
-import { redis } from '@/lib/redisClient'
-import { getPrice } from '@/lib/priceStoreRedis'
-import prisma from '@/lib/prisma'
-import { addGameEvent } from '@/lib/gameStoreRedis'
+import { redis } from '@/lib/services/redisClient'
+import { getPrice } from '@/lib/stores/priceStoreRedis'
+import prisma from '@/lib/services/prisma'
+import { addGameEvent } from '@/lib/stores/gameStoreRedis'
 
 const KEY_SCHEDULE = 'game:guess:queue'
 const POLL_INTERVAL = 1000 // 1s
