@@ -1,6 +1,6 @@
 import { ScaleBand, ScaleLinear } from 'd3-scale'
 import React, { FunctionComponent } from 'react'
-import { Candle } from '@/components/molecules/candle-chart/Candles'
+import { Candle } from '@/components/molecules/charts/candle-chart/Candles'
 
 interface YAxisGridProps {
   yScale: ScaleLinear<number, number>

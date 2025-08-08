@@ -18,90 +18,93 @@ export type ConfigPayload = {
   duration?: number
 }
 
-export const DELETE = async (
-  req: Request,
-  context: { params: Promise<{ configId: string }> }
-) => {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) 
-    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
-  
-  const userId = session.user.id
+const bad = (status: number, error: string) => {
+  return NextResponse.json({ error }, { status })
+}
 
-  const { configId } = await context.params
-  if (!configId) 
-    return NextResponse.json({ error: 'Missing config id' }, { status: 400 })
+const getUserId = async() => {
+  const session = await getServerSession(authOptions)
+  return session?.user?.id ?? null
+}
+
+/* -------------------- DELETE (owner only) -------------------- */
+export const DELETE = async (
+  _req: Request,
+  { params }: { params: { configId: string } }
+) => {
+  const userId = await getUserId()
+  if (!userId) return bad(401, 'Not authenticated')
+
+  const { configId } = params
+  if (!configId) return bad(400, 'Missing config id')
 
   const config = await prisma.gameConfig.findUnique({
     where: { id: configId },
-    select: { userId: true }
+    select: { userId: true },
   })
-  if (!config) 
-    return NextResponse.json({ error: 'Config not found' }, { status: 404 })
-  
-  if (config.userId !== userId) 
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  if (!config) return bad(404, 'Config not found')
+  if (config.userId !== userId) return bad(403, 'Forbidden')
 
   await prisma.gameConfig.delete({ where: { id: configId } })
   return new NextResponse(null, { status: 204 })
 }
 
+/* -------------------- GET (owner OR public OR member) -------------------- */
 export const GET = async (
-  req: Request,
-  context: {
-    params: Promise<{ configId: string }>
-  }
+  _req: Request,
+  { params }: { params: { configId: string } }
 ) => {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) 
-    return NextResponse.json(
-      { error: 'Not authenticated' },
-      { status: 401 }
-    )
-  
-  const userId = session.user.id
-  const { configId } = await context.params
-  if (!configId)
-    return NextResponse.json(
-      { error: 'Missing config id' },
-      { status: 400 }
-    )
+  const userId = await getUserId() // may be null (not logged in)
+  const { configId } = params
+  if (!configId) return bad(400, 'Missing config id')
+
   const config = await prisma.gameConfig.findUnique({
     where: { id: configId },
   })
-  if (!config) 
-    return NextResponse.json(
-      { error: 'Config not found' },
-      { status: 404 }
-    )
-  if (config.userId === userId) 
-    return NextResponse.json(config)
+  if (!config) return bad(404, 'Config not found')
 
-  if (!config.userId) 
-    return NextResponse.json(config)
+  const isOwner = !!userId && config.userId === userId
+  const isPublic = !!config.isPublic
+  const isDefaultConfig = config.userId == null
 
-  const membership = await prisma.userState.findFirst({
-    where: {
-      userId,
-      game: { configId },
-    },
+  let isMember = false
+  if (userId && !isOwner && !isPublic && !isDefaultConfig) {
+    const membership = await prisma.userState.findFirst({
+      where: { userId, game: { configId } },
+      select: { id: true },
+    })
+    isMember = !!membership
+  }
+
+  if (!(isOwner || isPublic || isDefaultConfig || isMember)) 
+    return bad(403, 'Forbidden')
+  
+
+  return NextResponse.json({
+    ...config,
+    canEdit: isOwner,         // handy for the UI
+    currentUserId: userId,    // optional convenience
   })
-  if (membership) 
-    return NextResponse.json(config)
-
-  return NextResponse.json(
-    { error: 'Forbidden' },
-    { status: 403 }
-  )
 }
 
+/* -------------------- PATCH (owner only) -------------------- */
 export const PATCH = async (
   req: Request,
-  context: {
-    params: Promise<{ configId: string }>
-  }
+  { params }: { params: { configId: string } }
 ) => {
-  const { configId } = await context.params
+  const userId = await getUserId()
+  if (!userId) return bad(401, 'Not authenticated')
+
+  const { configId } = params
+  if (!configId) return bad(400, 'Missing config id')
+
+  const ownerCheck = await prisma.gameConfig.findUnique({
+    where: { id: configId },
+    select: { userId: true },
+  })
+  if (!ownerCheck) return bad(404, 'Config not found')
+  if (ownerCheck.userId !== userId) return bad(403, 'Forbidden')
+
   const {
     name,
     guessingPeriod,
@@ -112,35 +115,13 @@ export const PATCH = async (
     duration = 0,
   } = (await req.json()) as ConfigPayload
 
-  if (!configId)
-    return NextResponse.json(
-      { error: 'Missing config id' },
-      { status: 400 }
-    )
-
-  if (guessingPeriod < MIN_GUESSING_PERIOD) 
-    return NextResponse.json(
-      {
-        error: `guessingPeriod must be at least ${MIN_GUESSING_PERIOD}ms`,
-      },
-      { status: 400 }
-    )
-
-  if (duration !== 0 && duration < guessingPeriod + MIN_DURATION_OFFSET) 
-    return NextResponse.json(
-      {
-        error: `duration must be 0 or at least guessingPeriod + ${MIN_DURATION_OFFSET}ms`,
-      },
-      { status: 400 }
-    )
-
-  if (maxPlayers < 0 || maxPlayers > MAX_PLAYERS) 
-    return NextResponse.json(
-      {
-        error: `maxPlayers must be between 0 and ${MAX_PLAYERS}`,
-      },
-      { status: 400 }
-    )
+  if (!name) return bad(400, 'name is required')
+  if (guessingPeriod < MIN_GUESSING_PERIOD)
+    return bad(400, `guessingPeriod must be at least ${MIN_GUESSING_PERIOD}ms`)
+  if (duration !== 0 && duration < guessingPeriod + MIN_DURATION_OFFSET)
+    return bad(400, `duration must be 0 or at least guessingPeriod + ${MIN_DURATION_OFFSET}ms`)
+  if (maxPlayers < 0 || maxPlayers > MAX_PLAYERS)
+    return bad(400, `maxPlayers must be between 0 and ${MAX_PLAYERS}`)
 
   const data: any = {
     name,
@@ -150,24 +131,25 @@ export const PATCH = async (
     maxPlayers,
     duration,
   }
-  if (scoreStreaksEnabled) 
-    data.scoreStreakThresholds = scoreStreakThresholds || ''
+  // only store thresholds if enabled; clear otherwise
+  data.scoreStreakThresholds = scoreStreaksEnabled ? (scoreStreakThresholds ?? '') : null
 
   try {
     const updated = await prisma.gameConfig.update({
       where: { id: configId },
       data,
     })
-    return NextResponse.json(updated)
+    return NextResponse.json({ ...updated, canEdit: true })
   } catch (e: any) {
-    return NextResponse.json(
-      { error: e.message || 'Failed to update config' },
-      { status: 500 }
-    )
+    return bad(500, e.message || 'Failed to update config')
   }
 }
 
+/* -------------------- POST (create; owner = current user) -------------------- */
 export const POST = async (req: Request) => {
+  const userId = await getUserId()
+  if (!userId) return bad(401, 'Not authenticated')
+
   const {
     name,
     guessingPeriod,
@@ -178,27 +160,13 @@ export const POST = async (req: Request) => {
     duration = 0,
   } = (await req.json()) as ConfigPayload
 
-  if (guessingPeriod < MIN_GUESSING_PERIOD) 
-    return NextResponse.json(
-      { error: `guessingPeriod must be at least ${MIN_GUESSING_PERIOD}ms` },
-      { status: 400 }
-    )
-
-  if (duration !== 0 && duration < guessingPeriod + MIN_DURATION_OFFSET) 
-    return NextResponse.json(
-      {
-        error: `duration must be 0 or at least guessingPeriod + ${MIN_DURATION_OFFSET}ms`,
-      },
-      { status: 400 }
-    )
-
-  if (maxPlayers < 0 || maxPlayers > MAX_PLAYERS) 
-    return NextResponse.json(
-      {
-        error: `maxPlayers must be between 0 and ${MAX_PLAYERS}`,
-      },
-      { status: 400 }
-    )
+  if (!name) return bad(400, 'name is required')
+  if (guessingPeriod < MIN_GUESSING_PERIOD)
+    return bad(400, `guessingPeriod must be at least ${MIN_GUESSING_PERIOD}ms`)
+  if (duration !== 0 && duration < guessingPeriod + MIN_DURATION_OFFSET)
+    return bad(400, `duration must be 0 or at least guessingPeriod + ${MIN_DURATION_OFFSET}ms`)
+  if (maxPlayers < 0 || maxPlayers > MAX_PLAYERS)
+    return bad(400, `maxPlayers must be between 0 and ${MAX_PLAYERS}`)
 
   const data: any = {
     name,
@@ -207,10 +175,25 @@ export const POST = async (req: Request) => {
     bettingMode,
     maxPlayers,
     duration,
+    userId, // 👈 set owner
   }
-  if (scoreStreaksEnabled) 
-    data.scoreStreakThresholds = scoreStreakThresholds || ''
+  data.scoreStreakThresholds = scoreStreaksEnabled ? (scoreStreakThresholds ?? '') : null
 
-  const config = await prisma.gameConfig.create({ data })
-  return NextResponse.json(config, { status: 201 })
+  const created = await prisma.gameConfig.create({
+    data,
+    select: {
+      id: true,
+      name: true,
+      userId: true,
+      scoreStreaksEnabled: true,
+      scoreStreakThresholds: true,
+      guessingPeriod: true,
+      bettingMode: true,
+      maxPlayers: true,
+      duration: true,
+      isPublic: true,
+    },
+  })
+
+  return NextResponse.json({ ...created, canEdit: true }, { status: 201 })
 }

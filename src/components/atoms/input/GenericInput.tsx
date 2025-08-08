@@ -81,7 +81,7 @@ const GenericInput = <T extends 'input' | 'textarea' = 'input'>({
       </label>
 
       {hint && (
-        <p className={`mt-2 ml-2 text-xs ${hintColorClass}`}>{hint}</p>
+        <p className={`mt-2 ml-2 text-xs ${hintColorClass} whitespace-pre-line`}>{hint}</p>
       )}
     </div>
   )

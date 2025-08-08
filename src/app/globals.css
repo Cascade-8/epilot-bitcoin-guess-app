@@ -55,3 +55,33 @@ body {
     color:            rgba(209, 213, 219, var(--tw-text-opacity)); /* text-gray-200 */
   }
 }
+
+/* Rocket launch sequence:
+   - Rotate to -45deg
+   - Blast upward off-screen
+   - Teleport below (hidden)
+   - Pop back into place */
+.rocket {
+  display: inline-block;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+/* For the portal version: runs in viewport space, not clipped by containers */
+.rocket--launch-fixed {
+  animation: rocket-prep-liftoff 1.8s cubic-bezier(0.2, 0.6, 0.2, 1) forwards;
+}
+
+/* translateY BEFORE rotate so it flies straight up relative to the page */
+@keyframes rocket-prep-liftoff {
+  0%   { transform: translateY(0) rotate(0deg); }
+  10%  { transform: translateY(0) rotate(-45deg); }   /* point up */
+  25%  { transform: translateY(8px) rotate(-45deg); } /* little dip */
+  60%  { transform: translateY(0) rotate(-45deg); }   /* back to pad */
+  65%  { transform: translateY(0) rotate(-45deg); }   /* hover */
+  100% { transform: translateY(-150vh) rotate(-45deg); } /* blast off out of viewport */
+}
+
+
+
+

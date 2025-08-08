@@ -11,10 +11,10 @@ import Decimal from 'decimal.js'
 import { scaleBand, scaleLinear } from 'd3-scale'
 import { useBitcoinPrices } from '@/context/BitcoinPriceContext'
 import { useGame } from '@/context/GameContext'
-import { Candles } from '@/components/molecules/candle-chart/Candles'
-import { VerticalGrid, YAxisGrid } from '@/components/molecules/candle-chart/YAxis'
-import { XAxisLabels } from '@/components/molecules/candle-chart/XAxis'
-import { PriceLine } from '@/components/molecules/candle-chart/PriceLine'
+import { Candles } from '@/components/molecules/charts/candle-chart/Candles'
+import { VerticalGrid, YAxisGrid } from '@/components/molecules/charts/candle-chart/YAxis'
+import { XAxisLabels } from '@/components/molecules/charts/candle-chart/XAxis'
+import { PriceLine } from '@/components/molecules/charts/candle-chart/PriceLine'
 
 export interface ChartConfig {
   bucketInterval?: number

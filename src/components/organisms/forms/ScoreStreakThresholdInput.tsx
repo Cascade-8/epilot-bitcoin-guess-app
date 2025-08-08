@@ -1,121 +1,62 @@
 'use client'
-/**
- * Experimental functionality to handle complex scoring functions.
- * Due to time, I could not finish it.
- */
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import GenericInput from '@/components/atoms/input/GenericInput'
-
-type FuncDef = { raw: string; expr: string; cond?: string }
-type PreviewPoint = { n: number; v: number }
-
-const parseFuncs = (s: string): FuncDef[] =>
-  s
-    .split(';')
-    .map(p => p.trim())
-    .filter(Boolean)
-    .map(raw => {
-      const m = raw.match(
-        /^f\(\s*n\s*[:;]\s*([0-9n+\-*/\s()]+)(?::([^()]+))?\s*\)$/
-      )
-      if (!m) throw new Error(`Invalid syntax: ${raw}`)
-      return { raw, expr: m[1].trim(), cond: m[2]?.trim() }
-    })
-
-const validateFuncSet = (funcs: FuncDef[]): string | undefined => {
-  if (funcs.filter(f => !f.cond).length !== 1) 
-    return 'Provide exactly one default (no condition)'
-  
-  const assigned = new Set<number>()
-  for (const f of funcs) {
-    if (!f.cond) continue
-    const cf = new Function('n', `return ${f.cond}`) as (n: number) => boolean
-    for (let n = 1; n <= 100; n++) 
-      if (cf(n)) {
-        if (assigned.has(n)) 
-          return `n=${n} matches multiple conditions`
-        
-        assigned.add(n)
-      }
-    
-  }
-  return undefined
-}
+import {
+  getFunctionColors,
+  getPreviewData,
+  parseFuncs,
+  validateFuncSet
+} from '@/lib/helpers/scoreStreaksHelper'
+import ScoreStreaksChart from '@/components/molecules/charts/scoreStreaksChart/ScoreStreaksChart'
 
 type Props = {
   value: string
   onChange: (v: string) => void
 }
 
-export const ScoreStreakThresholdInput: React.FC<Props> = ({
-  value,
-  onChange,
-}) => {
-  const { error, funcs } = useMemo(() => {
-    const s = value.trim()
-    if (!s) return { error: undefined as undefined, funcs: [] as FuncDef[] }
-    try {
-      const fdefs = parseFuncs(s)
-      const ve = validateFuncSet(fdefs)
-      return { error: ve, funcs: fdefs }
-    } catch (e: any) {
-      return { error: e.message, funcs: [] as FuncDef[] }
-    }
-  }, [value])
+export const ScoreStreakThresholdInput: React.FC<Props> = ({ value, onChange }) => {
+  const { funcs, errors } = useMemo(() => parseFuncs(value.trim()), [value])
+  const validateError = useMemo(() => (value ? validateFuncSet(funcs) : undefined), [funcs, value])
 
-  const fns = useMemo(
-    () =>
-      funcs.map(f =>
-        // eslint-disable-next-line no-new-func
-        new Function('n', `return ${f.expr}`) as (n: number) => number
-      ),
-    [funcs]
+  const previews = useMemo(() => {
+    if (errors.length || validateError || !value) return null
+    return getPreviewData(value.trim())
+  }, [value, errors, validateError])
+
+  const hintText = useMemo(() => {
+    const parts: string[] = []
+    if (!value) parts.push('e.g. f(n:n+2);f(n:n*2:n>5);f(n:n*3:5<n<12)')
+    if (errors.length) parts.push(...errors)
+    if (validateError) parts.push(validateError)
+    return parts.length ? parts.join('\n') : undefined
+  }, [value, errors, validateError])
+
+  const { colors, defaultIndex } = useMemo(
+    () => getFunctionColors(value.trim()),
+    [value]
   )
 
-  const previews = useMemo<
-    { label: string; pts: PreviewPoint[] }[] | null
-  >(() => {
-    if (error || funcs.length === 0) return null
+  const [editingIndex, setEditingIndex] = useState<number | null>(null)
+  const [tempValue, setTempValue] = useState<string>('')
 
-    // Build condition ranges [min, max] for each conditional
-    const condRanges = funcs
-      .map((f, i) => {
-        if (!f.cond) return null
-        const cf = new Function('n', `return ${f.cond}`) as (n: number) => boolean
-        const matches: number[] = []
-        for (let n = 1; n <= 100; n++) 
-          if (cf(n)) matches.push(n)
-        
-        if (matches.length === 0) return null
-        return { idx: i, min: Math.min(...matches), max: Math.max(...matches) }
-      })
-      .filter((x): x is { idx: number; min: number; max: number } => !!x)
-      .sort((a, b) => a.min - b.min)
+  const handleBadgeClick = (idx: number, current: string) => {
+    setEditingIndex(idx)
+    setTempValue(current)
+  }
 
-    return funcs.map((f, i) => {
-      const pts: PreviewPoint[] = []
-      if (f.cond) {
-        // For conditional: take up to 5 values from its [min..max]
-        const range = condRanges.find(r => r.idx === i)!
-        let count = 0
-        for (let n = range.min; n <= range.max && count < 5; n++) {
-          pts.push({ n, v: fns[i](n) })
-          count++
-        }
-      } else {
-        // Default: values between first and second condition ranges
-        const first = condRanges[0]
-        const second = condRanges[1]
-        const start = first.max + 1
-        const end = second ? second.min - 1 : start + 4
-        for (let n = start; n <= end; n++) 
-          pts.push({ n, v: fns[i](n) })
-        
-      }
-      const label = f.cond ? f.raw : `Default ${f.raw}`
-      return { label, pts }
-    })
-  }, [funcs, fns, error])
+  const handleBadgeSave = () => {
+    if (editingIndex === null) return
+    const parts = value.split(';').map(v => v.trim())
+    parts[editingIndex] = tempValue.trim()
+    onChange(parts.join(';'))
+    setEditingIndex(null)
+    setTempValue('')
+  }
+
+  const handleBadgeCancel = () => {
+    setEditingIndex(null)
+    setTempValue('')
+  }
 
   return (
     <div>
@@ -123,29 +64,87 @@ export const ScoreStreakThresholdInput: React.FC<Props> = ({
         label="Score Streak Thresholds"
         value={value}
         setValue={onChange}
-        hint={
-          !value
-            ? 'e.g. f(n:n+2:n<5);f(n:n+3:n>7);f(n:n*2)'
-            : error
-              ? error
-              : undefined
-        }
+        hint={hintText}
         hintColorClass={
-          !value
-            ? 'text-slate-400'
-            : error
-              ? 'text-red-400'
-              : 'text-slate-400'
+          hintText && (errors.length || validateError ? 'text-red-400' : 'text-slate-400')
         }
       />
 
-      {previews &&
-        previews.map(({ label, pts }) => (
-          <div key={label} className="text-indigo-300 text-sm mt-2">
-            <strong>{label}:</strong>{' '}
-            {pts.map(({ n, v }) => `${n} → ${v}`).join(', ')}
-          </div>
-        ))}
+      {/* Function Badges */}
+      <div className="flex flex-wrap gap-2 mt-3">
+        {value
+          .split(';')
+          .filter(v => v.trim().length)
+          .map((fn, idx) => {
+            const isDefault = idx === defaultIndex
+            const bgColor = isDefault ? 'bg-orange-300 text-black' : ''
+            const badgeColor = !isDefault ? { backgroundColor: colors[idx], color: '#000' } : undefined
+
+            if (editingIndex === idx) 
+              return (
+                <div key={idx} className="flex items-center gap-1">
+                  <input
+                    type="text"
+                    className="px-2 py-1 text-sm rounded bg-slate-800 border border-slate-500"
+                    value={tempValue}
+                    onChange={e => setTempValue(e.target.value)}
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    className="text-green-400 text-xs"
+                    onClick={handleBadgeSave}
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    className="text-red-400 text-xs"
+                    onClick={handleBadgeCancel}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )
+            
+
+            return (
+              <span
+                key={idx}
+                className={`px-2 py-1 rounded cursor-pointer text-sm ${bgColor}`}
+                style={badgeColor}
+                onClick={() => handleBadgeClick(idx, fn)}
+              >
+                {fn}
+              </span>
+            )
+          })}
+      </div>
+
+      {/* Previews + Chart */}
+      {previews && (() => {
+        const { colors, defaultIndex } = getFunctionColors(value.trim())
+        return (
+          <>
+            {previews.map(({ label, pts }, rowIdx) => {
+              const isDefault = rowIdx === defaultIndex
+              const style = isDefault ? undefined : { color: colors[rowIdx] }
+              const className = `text-sm mt-2 ${isDefault ? 'text-orange-300' : ''}`
+              return (
+                <div key={label} className={className} style={style}>
+                  <strong>{label}:</strong>{' '}
+                  {pts.length > 0
+                    ? pts.map(({ n, v }) => `${n} → ${v}`).join(', ')
+                    : '—'}
+                </div>
+              )
+            })}
+            <div className="my-3 h-[260px] w-full">
+              <ScoreStreaksChart thresholds={value} nMax={50} />
+            </div>
+          </>
+        )
+      })()}
     </div>
   )
 }

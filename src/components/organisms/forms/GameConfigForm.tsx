@@ -4,6 +4,7 @@ import React, { useState, FormEvent } from 'react'
 import { TextInput, NumberInput } from '@/components/atoms/input/GenericInput'
 import { GenericButton } from '@/components/atoms/buttons/GenericButton'
 import { ScoreStreakThresholdInput } from '@/components/organisms/forms/ScoreStreakThresholdInput'
+import ScoreStreaksChart from '@/components/molecules/charts/scoreStreaksChart/ScoreStreaksChart'
 
 export interface GameConfig {
   name: string
@@ -53,7 +54,7 @@ export const GameConfigForm: React.FC<GameConfigFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 bg-indigo-800 p-6 rounded"
+      className="space-y-6 bg-indigo-800 p-6 rounded"
     >
       <TextInput
         label="Config Name"
@@ -92,15 +93,15 @@ export const GameConfigForm: React.FC<GameConfigFormProps> = ({
         />
       )}
 
-      <label className="flex items-center space-x-2 text-indigo-200">
-        <input
-          type="checkbox"
-          checked={form.bettingMode}
-          onChange={e => handleChange('bettingMode', e.target.checked)}
-          className="accent-cyan-400"
-        />
-        <span>Enable Betting Mode</span>
-      </label>
+      {/*<label className="flex items-center space-x-2 text-indigo-200">*/}
+      {/*  <input*/}
+      {/*    type="checkbox"*/}
+      {/*    checked={form.bettingMode}*/}
+      {/*    onChange={e => handleChange('bettingMode', e.target.checked)}*/}
+      {/*    className="accent-cyan-400"*/}
+      {/*  />*/}
+      {/*  <span>Enable Betting Mode</span>*/}
+      {/*</label>*/}
 
       <NumberInput
         label="Max Players"
