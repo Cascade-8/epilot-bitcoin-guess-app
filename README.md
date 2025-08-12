@@ -168,6 +168,83 @@ src/
 
 ---
 
+## Sequences:
+
+### Price Stream
+```mermaid
+sequenceDiagram
+autonumber
+participant Binance as Binance Price Stream
+participant Worker as Price Streamer<br/>(server/worker)
+participant Redis as Redis (Cache + Pub/Sub)
+participant SSE as SSE Endpoint<br/>(/api/stream)
+participant UI as Browser
+
+    Binance-->>Worker: BTC/USDT ticks (ws)
+    Worker->>Redis: SET price:btc:now {value, ts}
+    Worker->>Redis: PUBLISH price:btc:updates {value, ts}
+
+    note over SSE: Subscribed to Redis pub/sub
+    Redis-->>SSE: price update event
+    SSE-->>UI: SSE "message" {price, ts}
+    UI->>UI: Update UI (latest price)
+```
+
+### Guess Resolution
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Worker as Guess Resolution Worker
+    participant Redis as Redis (ZSET queue)
+    participant Price as getPrice() (Redis price store)
+    participant DB as Postgres (Prisma)
+    participant SSE as addGameEvent() (Redis Pub/Sub)
+    participant UI as Browser (EventSource)
+
+    Note over Worker: Runs every 1s (POLL_INTERVAL)
+    Worker->>Redis: MULTI()<br>ZRANGEBYSCORE queue 0 now<br>ZREMRANGEBYSCORE queue 0 now<br>EXEC
+    Redis-->>Worker: List of due guesses (raw JSON)
+
+    loop for each guess
+        Worker->>Price: getPrice()
+        Price-->>Worker: {price}
+
+        alt type = "up"
+            Worker->>Worker: outcome = current.price > submittedPrice
+        else type = "down"
+            Worker->>Worker: outcome = current.price < submittedPrice
+        end
+
+        Note over Worker: If equal → outcome = false (wrong)
+
+        Worker->>DB: SELECT game config (scoreStreaksEnabled, thresholds)
+
+        Worker->>DB: $transaction:
+        DB->>DB: UPDATE guess { outcome }
+        DB->>DB: FIND userState (or create with 0 score, 0 streak)
+        alt outcome = true
+            DB->>DB: streak = streak + 1
+            alt streaks enabled & thresholds set
+                DB->>DB: delta = calculateScore(thresholds, streak)
+            else
+                DB->>DB: delta = 1
+            end
+        else outcome = false
+            DB->>DB: streak = 0
+            DB->>DB: delta = -1
+        end
+        DB->>DB: UPDATE userState { score += delta, streak }
+        DB-->>Worker: { updatedGuess, updatedState }
+
+        Worker->>SSE: addGameEvent(gameId, userId, { event: "guess", data: updatedGuess })
+        Worker->>SSE: addGameEvent(gameId, userId, { event: "state", data: updatedState })
+        SSE-->>UI: SSE messages (guess result, updated score/streak)
+        UI->>UI: Update UI
+    end
+```
+
+
+
 ## License
 
 MIT © Cascade Solutions
