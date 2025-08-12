@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom'
 
 type Props = {
   streak?: number | null
-  lastDelta?: number | null   // pass >0 when a win resolves
+  lastDelta?: number | null
   className?: string
 }
 
@@ -17,26 +17,22 @@ export const ScoreStreakDisplay: React.FC<Props> = ({
 }) => {
   const anchorRef = useRef<HTMLSpanElement | null>(null)
 
-  // portal animation state
   const [animating, setAnimating] = useState(false)
   const [origin, setOrigin] = useState<{ left: number; top: number } | null>(null)
   const portalRef = useRef<HTMLSpanElement | null>(null)
   const animRef = useRef<Animation | null>(null)
-  const startedRef = useRef(false)        // guard against double-start (StrictMode etc.)
+  const startedRef = useRef(false)
   const prevStreak = useRef(streak ?? 0)
 
-  // Trigger on explicit positive delta
   useEffect(() => {
     if ((lastDelta ?? 0) > 0) tryStartLaunch()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastDelta])
 
-  // Also trigger when streak number increases
   useEffect(() => {
-    const curr = typeof streak === 'number' ? streak : 0
+    const curr = streak || 0
     if (curr > (prevStreak.current ?? 0)) tryStartLaunch()
     prevStreak.current = curr
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [streak])
 
   const tryStartLaunch = () => {
@@ -49,13 +45,11 @@ export const ScoreStreakDisplay: React.FC<Props> = ({
     setAnimating(true)
   }
 
-  // Start WAAPI once animating=true and portal exists
   useEffect(() => {
     if (!animating || !origin) return
     const el = portalRef.current
     if (!el) return
 
-    // position at the anchor (viewport space)
     el.style.position = 'fixed'
     el.style.left = `${origin.left}px`
     el.style.top = `${origin.top}px`
@@ -68,31 +62,27 @@ export const ScoreStreakDisplay: React.FC<Props> = ({
       window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
     if (prefersReduced || !('animate' in el)) {
-      // minimal motion fallback
       el.style.transform = 'translateY(0) rotate(-45deg)'
       const t = setTimeout(handleFinish, 400)
       return () => clearTimeout(t)
     }
 
-    // translate FIRST, then rotate, so path is vertical on screen
     const anim = el.animate(
       [
-        { transform: 'translateY(0) rotate(0deg)',        offset: 0.0,  easing: 'ease-out' },   // quick rotate start
+        { transform: 'translateY(0) rotate(0deg)',        offset: 0.0,  easing: 'ease-out' },
         { transform: 'translateY(0) rotate(-45deg)',      offset: 0.12, easing: 'ease-in-out' },
-        { transform: 'translateY(10px) rotate(-45deg)',   offset: 0.30, easing: 'ease-in-out' }, // slightly slower dip
-        { transform: 'translateY(0) rotate(-45deg)',      offset: 0.62, easing: 'ease-in-out' }, // back to pad
+        { transform: 'translateY(10px) rotate(-45deg)',   offset: 0.30, easing: 'ease-in-out' },
+        { transform: 'translateY(0) rotate(-45deg)',      offset: 0.62, easing: 'ease-in-out' },
 
-        // tiny hover wobble (~0.5s total hover)
         { transform: 'translateY(-1px) rotate(-45deg)',   offset: 0.66, easing: 'ease-in-out' },
         { transform: 'translateY(1px)  rotate(-45deg)',   offset: 0.70, easing: 'ease-in-out' },
-        { transform: 'translateY(0)    rotate(-45deg)',   offset: 0.74, easing: 'cubic-bezier(0.42, 0, 1, 1)' }, // <-- ease-in for next segment
+        { transform: 'translateY(0)    rotate(-45deg)',   offset: 0.74, easing: 'cubic-bezier(0.42, 0, 1, 1)' },
 
-        // blast off (accelerates!)
-        { transform: 'translateY(-180vh) rotate(-45deg)', offset: 1.0 } // flies fully off-screen
+        { transform: 'translateY(-180vh) rotate(-45deg)', offset: 1.0 }
       ],
       {
         duration: LAUNCH_MS,
-        easing: 'linear',      // let per-keyframe easing control phases
+        easing: 'linear',
         fill: 'forwards',
       }
     )
@@ -107,11 +97,9 @@ export const ScoreStreakDisplay: React.FC<Props> = ({
       anim.removeEventListener('cancel', onDone)
       anim.cancel()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [animating, origin])
 
   const handleFinish = () => {
-    // cleanup without causing extra re-renders during animation
     animRef.current = null
     startedRef.current = false
     setAnimating(false)
@@ -129,7 +117,6 @@ export const ScoreStreakDisplay: React.FC<Props> = ({
 
   return (
     <div className={`flex items-center gap-3 overflow-visible ${className || ''}`}>
-      {/* Inline anchor rocket (never animated) — hidden while the portal rocket is flying */}
       <span
         ref={anchorRef}
         className="select-none inline-block"
@@ -138,16 +125,12 @@ export const ScoreStreakDisplay: React.FC<Props> = ({
       >
         🚀
       </span>
-
-      {/* Viewport-layer rocket, not clipped by containers */}
       {animating && origin && typeof document !== 'undefined'
         ? createPortal(
           <span ref={portalRef} className="select-none inline-block">🚀</span>,
           document.body
         )
         : null}
-
-      {/* The streak pill */}
       <div
         className={pillClasses}
         style={

@@ -1,5 +1,5 @@
 /**
- * Price Storage file to store the streamed prices into redit
+ * Price Storage file to store the streamed prices into redis
  */
 
 import Redis from 'ioredis'

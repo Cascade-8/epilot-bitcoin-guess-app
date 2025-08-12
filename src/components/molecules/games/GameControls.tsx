@@ -16,22 +16,18 @@ type Props = {
   price?: number | null
   currentGuess: { type: 'up' | 'down'; price: number; timestamp: Date } | null
   canGuess: boolean
-  onGuess: (type: 'up' | 'down') => void
-
-  // score/timer UI
+  onGuessAction: (type: 'up' | 'down') => void
   score: number
   timeLeftMs: number
   isUrgent: boolean
   isCorrect: boolean | null
-
-  // animation for score delta
   lastDelta: number | null
 }
 
 export const GameControls: React.FC<Props> = ({
   currentGuess,
   canGuess,
-  onGuess,
+  onGuessAction,
   score,
   timeLeftMs,
   isUrgent,
@@ -45,7 +41,7 @@ export const GameControls: React.FC<Props> = ({
         {/* Up Button */}
         <div className="flex justify-center col-span-2 md:col-span-1 md:col-start-3 h-12">
           <GenericButton
-            onClick={() => onGuess('up')}
+            onClick={() => onGuessAction('up')}
             className={currentGuess?.type === 'up'
               ? 'disabled:!bg-indigo-700 disabled:!border-cyan-600 disabled:!text-cyan-600'
               : 'disabled:!bg-slate-500 disabled:!border-slate-600 disabled:opacity-60 opacity-100'}
@@ -58,7 +54,7 @@ export const GameControls: React.FC<Props> = ({
         {/* Down Button */}
         <div className="flex justify-center col-span-2 md:col-span-1 md:col-start-4 h-12">
           <GenericButton
-            onClick={() => onGuess('down')}
+            onClick={() => onGuessAction('down')}
             className={currentGuess?.type === 'down'
               ? 'disabled:!bg-indigo-700 disabled:!border-indigo-900'
               : 'disabled:!bg-slate-500 disabled:!border-slate-600 disabled:opacity-60 opacity-100'}

@@ -42,7 +42,6 @@ const ScoreStreakThresholdView: React.FC<Props> = ({ thresholds }) => {
 
   return (
     <div>
-      {/* Function Badges (read-only, same style as input) */}
       <div className="flex flex-wrap gap-2 mt-3">
         {value
           .split(';')
@@ -64,7 +63,6 @@ const ScoreStreakThresholdView: React.FC<Props> = ({ thresholds }) => {
           })}
       </div>
 
-      {/* Hint / tooltip (same content & tone as input) */}
       {hintText && (
         <div
           className={`mt-3 text-sm whitespace-pre-line rounded bg-indigo-900/40 px-3 py-2 ${
@@ -75,7 +73,6 @@ const ScoreStreakThresholdView: React.FC<Props> = ({ thresholds }) => {
         </div>
       )}
 
-      {/* Previews + Chart (identical rendering) */}
       {previews && (() => {
         const { colors, defaultIndex } = getFunctionColors(value)
         return (
@@ -101,4 +98,4 @@ const ScoreStreakThresholdView: React.FC<Props> = ({ thresholds }) => {
   )
 }
 
-export default ScoreStreakThresholdView
+export { ScoreStreakThresholdView }

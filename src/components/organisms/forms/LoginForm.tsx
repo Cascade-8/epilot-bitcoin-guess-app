@@ -1,14 +1,10 @@
 'use client'
 import { useState, FormEvent, ReactNode } from 'react'
-import { signIn, useSession } from 'next-auth/react'
+import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { TextInput } from '@/components/atoms/input/GenericInput'
 
-type LoginFormProps = {
-  children?: ReactNode
-}
-
-const LoginForm = ({ children }: LoginFormProps) => {
+const LoginForm = () => {
   const [mode, setMode] = useState<'login' | 'signup'>('login')
   const [form, setForm] = useState({ username: '', password: '' })
   const [error, setError] = useState<string | null>(null)
@@ -46,7 +42,6 @@ const LoginForm = ({ children }: LoginFormProps) => {
       return
     }
 
-    // At this point user is created — now log them in:
     const signInResult = await signIn('credentials', {
       redirect: false,
       username: form.username,
@@ -56,7 +51,7 @@ const LoginForm = ({ children }: LoginFormProps) => {
     if (signInResult?.error)
       setError(signInResult.error)
     else
-      router.push('/game-engine/game')   // or router.push('/') to go to your dashboard
+      router.push('/game-engine/game')
 
   }
 

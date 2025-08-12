@@ -41,14 +41,13 @@ const GenericButton: React.FC<GenericButtonProps> = ({
         activeStyle,
         disabledStyle,
         transitionStyle,
-        className,         // <— your custom classes go last
+        className
       ]
         .filter(Boolean)
         .join(' ')}
       onClick={e => {
         if (disabled) return
         onClick?.(e)
-        // remove focus so hover/active styles don’t stick
         ;(e.currentTarget as HTMLButtonElement).blur()
       }}
       disabled={disabled}

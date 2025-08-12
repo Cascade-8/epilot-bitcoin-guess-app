@@ -9,7 +9,6 @@ type GameEvent = {
 
 const PUB_PREFIX = 'game:'
 
-// Publish (emit) a game event
 const addGameEvent = async (
   gameId: string,
   userId: string,
@@ -20,7 +19,6 @@ const addGameEvent = async (
   await redis.publish(channel, msg)
 }
 
-// Subscribe to live game events (no history)
 const subscribeGame = (
   gameId: string,
   userId: string,

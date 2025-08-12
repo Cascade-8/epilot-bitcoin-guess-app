@@ -35,17 +35,14 @@ const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const newToast: Toast = { id, message, type, exiting: false }
     setToasts(prev => [...prev, newToast])
 
-    // Stage exit animation after 5s
     setTimeout(() => {
       setToasts(prev => prev.map(t => t.id === id ? { ...t, exiting: true } : t))
-      // Remove after exit animation (0.3s)
       setTimeout(() => {
         setToasts(prev => prev.filter(t => t.id !== id))
       }, 300)
     }, 5000)
   }, [])
 
-  // Helper for styles/icon
   const getToastConfig = (type: Toast['type'] = 'info') => {
     switch (type) {
     case 'success':
@@ -63,7 +60,6 @@ const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <ToastContext.Provider value={{ addToast }}>
       {children}
-      {/* Toast container */}
       <div className="fixed bottom-20 inset-x-0 px-4 flex flex-col items-center space-y-2 z-50">
         {toasts.map(t => {
           const { bg, text, icon } = getToastConfig(t.type)
@@ -81,7 +77,6 @@ const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         })}
       </div>
 
-      {/* Toast animations */}
       <style jsx>{`
           @keyframes enter {
               from { opacity: 0; transform: translateY(20px); }
@@ -103,7 +98,7 @@ const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   )
 }
 
-// Hook
+
 const useToast = (): ToastContextType => {
   const context = useContext(ToastContext)
   if (!context) 

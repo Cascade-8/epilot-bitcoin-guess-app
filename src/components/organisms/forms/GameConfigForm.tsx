@@ -4,17 +4,7 @@ import React, { useState, FormEvent } from 'react'
 import { TextInput, NumberInput } from '@/components/atoms/input/GenericInput'
 import { GenericButton } from '@/components/atoms/buttons/GenericButton'
 import { ScoreStreakThresholdInput } from '@/components/organisms/forms/ScoreStreakThresholdInput'
-import ScoreStreaksChart from '@/components/molecules/charts/scoreStreaksChart/ScoreStreaksChart'
-
-export interface GameConfig {
-  name: string
-  guessingPeriod: number
-  scoreStreaksEnabled: boolean
-  scoreStreakThresholds: string
-  bettingMode: boolean
-  maxPlayers: number
-  duration: number
-}
+import { GameConfig } from '@/app/generated/prisma'
 
 interface GameConfigFormProps {
   initialData: GameConfig
@@ -88,7 +78,7 @@ export const GameConfigForm: React.FC<GameConfigFormProps> = ({
 
       {form.scoreStreaksEnabled && (
         <ScoreStreakThresholdInput
-          value={form.scoreStreakThresholds}
+          value={form.scoreStreakThresholds + ''}
           onChange={v => handleChange('scoreStreakThresholds', v)}
         />
       )}
@@ -120,7 +110,7 @@ export const GameConfigForm: React.FC<GameConfigFormProps> = ({
         min={0}
         step={1000}
         hint={
-          form.duration !== 0
+          form.duration !== 0 && form.duration !== null
             ? form.duration < form.guessingPeriod + 60000
               ? 'Must be ≥ period + 60000ms'
               : undefined

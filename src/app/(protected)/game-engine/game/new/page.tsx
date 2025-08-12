@@ -27,7 +27,6 @@ const CreateGamePage: React.FC = () => {
   })
   const [submitting, setSubmitting] = useState(false)
 
-  // Load configs
   useEffect(() => {
     const load = async () => {
       try {

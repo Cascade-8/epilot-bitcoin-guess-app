@@ -1,4 +1,3 @@
-// src/components/atoms/input/GenericInput.tsx
 'use client'
 
 import React, {

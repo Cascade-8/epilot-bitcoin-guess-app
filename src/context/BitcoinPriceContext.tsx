@@ -1,4 +1,3 @@
-// src/context/BitcoinPriceContext.tsx
 'use client'
 
 import React, {
@@ -49,14 +48,12 @@ export const BitcoinPriceProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     let es: EventSource
 
-    // 1) Fetch history once
     fetch('/api/currency-streams/bitcoin')
       .then(r => r.json())
       .then((hist: PricePoint[]) => {
         setRecentPrices(hist)
         setPrice(hist[hist.length - 1]?.price ?? null)
 
-        // 2) Open SSE for live updates
         es = new EventSource(
           '/api/game-engine/stream?channels=price:btc'
         )
@@ -71,10 +68,8 @@ export const BitcoinPriceProvider: React.FC<{ children: ReactNode }> = ({
             }
             if (msg.channel !== 'price:btc') return
 
-            // buffer incoming tick
             pendingRef.current.push({ time: msg.time, price: msg.price })
 
-            // schedule flush if none pending
             if (flushTimeout.current === null) 
               flushTimeout.current = window.setTimeout(() => {
                 setRecentPrices(prev => {
@@ -90,13 +85,10 @@ export const BitcoinPriceProvider: React.FC<{ children: ReactNode }> = ({
               }, FLUSH_INTERVAL)
             
           } catch {
-            // ignore parse errors
+
           }
         }
-
-        es.onerror = () => {
-          // EventSource will auto-reconnect
-        }
+        es.onerror = () => {}
       })
       .catch(err => console.error('Failed to load Bitcoin history', err))
 

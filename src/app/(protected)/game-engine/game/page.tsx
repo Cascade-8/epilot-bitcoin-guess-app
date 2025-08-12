@@ -30,11 +30,15 @@ export default function GamesPage() {
 
   return (
     <main className="p-8 max-w-7xl mx-auto space-y-8">
-      <h1 className="text-3xl font-semibold text-white flex justify-between items-center">Games<Link href={'/game-engine/game/new'} className={'h-10 w-32'}><GenericButton>Create Game</GenericButton></Link></h1>
+      <h1 className="text-3xl font-semibold text-white flex justify-between items-center">
+        Games
+        <Link href={'/game-engine/game/new'} className={'h-10 w-32'}>
+          <GenericButton>Create Game</GenericButton>
+        </Link>
+      </h1>
 
       {loading && <p className="text-indigo-200">Loading games…</p>}
       {error && <p className="text-red-400">{error}</p>}
-
       {!loading && !error && (
         <>
           <section className={['grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',

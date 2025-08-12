@@ -44,7 +44,6 @@ const GameProvider: React.FC<ProviderProps> = ({ children, game }) => {
   const [userStates, setUserStates] = useState<UserState[]>([])
   const [currentGuess, setCurrentGuess] = useState<Guess | undefined>()
 
-  // Load initial history and state
   useEffect(() => {
     fetch(`/api/game-engine/game/${gameId}/history`)
       .then(r => r.json())
@@ -57,7 +56,6 @@ const GameProvider: React.FC<ProviderProps> = ({ children, game }) => {
       .then((g: { userStates: UserState[] }) => setUserStates(g.userStates))
   }, [gameId])
 
-  // Subscribe to live game updates via SSE
   useEffect(() => {
     if (!userId) return
     const channel = `game:${gameId}:${userId}`

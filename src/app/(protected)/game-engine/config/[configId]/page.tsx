@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { GameConfigForm, GameConfig } from '@/components/organisms/forms/GameConfigForm'
+import { GameConfigForm } from '@/components/organisms/forms/GameConfigForm'
 import { GenericButton } from '@/components/atoms/buttons/GenericButton'
 import { useToast } from '@/context/ToastContext'
 import { PageSpinner } from '@/components/atoms/spinner/LogoSpinner'
-import ScoreStreakThresholdView from '@/components/organisms/forms/ScoreStreaksThresholdsView'
+import { ScoreStreakThresholdView } from '@/components/organisms/forms/ScoreStreaksThresholdsView'
+import { GameConfig } from '@/app/generated/prisma'
 
 type LoadedResponse = Partial<GameConfig> & {
   id?: string
@@ -29,7 +30,6 @@ export default function ConfigPage() {
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Load config (must exist)
   useEffect(() => {
     if (!configId) {
       setError('Missing config id')
@@ -48,19 +48,22 @@ export default function ConfigPage() {
         if (cancelled) return
         setFormData({
           name: json.name ?? '',
+          id: '',
           guessingPeriod: json.guessingPeriod ?? 10000,
           scoreStreaksEnabled: !!json.scoreStreaksEnabled,
           scoreStreakThresholds: json.scoreStreakThresholds ?? '',
           bettingMode: !!json.bettingMode,
           maxPlayers: json.maxPlayers ?? 0,
           duration: json.duration ?? 0,
+          isPublic: false,
+          userId: null
         })
 
         const inferred =
           typeof json.canEdit === 'boolean'
             ? json.canEdit
             : !!json.userId && !!json.currentUserId && json.userId === json.currentUserId
-        setCanEdit(!!inferred)
+        setCanEdit(inferred)
         setMode('view')
       } catch (e: any) {
         if (!cancelled) {
@@ -163,7 +166,6 @@ export default function ConfigPage() {
           </div>
         </>
       ) : (
-        // VIEW
         <>
           <div className="bg-indigo-800 p-6 rounded space-y-6 text-indigo-100">
             <p><strong>Name:</strong> {formData.name || '—'}</p>

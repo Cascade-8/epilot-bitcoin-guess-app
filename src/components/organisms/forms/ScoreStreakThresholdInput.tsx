@@ -14,7 +14,7 @@ type Props = {
   onChange: (v: string) => void
 }
 
-export const ScoreStreakThresholdInput: React.FC<Props> = ({ value, onChange }) => {
+const ScoreStreakThresholdInput: React.FC<Props> = ({ value, onChange }) => {
   const { funcs, errors } = useMemo(() => parseFuncs(value.trim()), [value])
   const validateError = useMemo(() => (value ? validateFuncSet(funcs) : undefined), [funcs, value])
 
@@ -70,7 +70,6 @@ export const ScoreStreakThresholdInput: React.FC<Props> = ({ value, onChange }) 
         }
       />
 
-      {/* Function Badges */}
       <div className="flex flex-wrap gap-2 mt-3">
         {value
           .split(';')
@@ -121,7 +120,6 @@ export const ScoreStreakThresholdInput: React.FC<Props> = ({ value, onChange }) 
           })}
       </div>
 
-      {/* Previews + Chart */}
       {previews && (() => {
         const { colors, defaultIndex } = getFunctionColors(value.trim())
         return (
@@ -149,4 +147,4 @@ export const ScoreStreakThresholdInput: React.FC<Props> = ({ value, onChange }) 
   )
 }
 
-export default ScoreStreakThresholdInput
+export { ScoreStreakThresholdInput }

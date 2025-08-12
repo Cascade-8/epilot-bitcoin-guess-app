@@ -19,7 +19,6 @@ const BottomNav = () => {
   const touchStartTime = useRef<number>(0)
   const scrollStartY = useRef<number>(0)
 
-  // detect touch capability once
   const isTouchDevice =
     typeof window !== 'undefined' &&
     ('ontouchstart' in window || navigator.maxTouchPoints > 0 || (navigator as any).msMaxTouchPoints > 0)
@@ -39,7 +38,6 @@ const BottomNav = () => {
     document.addEventListener('fullscreenchange', handleFsChange)
 
     if (isTouchDevice) {
-      // auto-hide after mount
       resetHideTimer()
 
       const handleTouchStart = (e: TouchEvent) => {
@@ -73,8 +71,6 @@ const BottomNav = () => {
         document.removeEventListener('fullscreenchange', handleFsChange)
       }
     }
-
-    // non-touch: cleanup fullscreen listener only
     return () => {
       document.removeEventListener('fullscreenchange', handleFsChange)
     }

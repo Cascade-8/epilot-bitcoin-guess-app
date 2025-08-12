@@ -77,7 +77,6 @@ const GameCanvas: FC = () => {
 
   return (
     <div className="flex flex-col px-4 sm:px-6 py-6 bg-indigo-800 border-2 border-indigo-500 text-gray-100 rounded-xl shadow-lg w-full h-full max-h-screen">
-      {/* Header: streak left, price right */}
       <div className="flex items-center justify-between">
         <ScoreStreakDisplay streak={streak} lastDelta={lastDelta}  />
         <PriceDisplay />
@@ -126,20 +125,17 @@ const GameCanvas: FC = () => {
         />
       </div>
 
-      {/* Controls get everything as props */}
       <GameControls
         price={price}
         currentGuess={currentGuess ? { type: currentGuess.type, price: currentGuess.price, timestamp: new Date(currentGuess.timestamp) } : null}
-        canGuess={!!canGuess}
-        onGuess={handleGuess}
+        canGuess={canGuess}
+        onGuessAction={handleGuess}
         score={score}
         timeLeftMs={timeLeft}
         isUrgent={isUrgent}
         isCorrect={isCorrect}
         lastDelta={lastDelta}
       />
-
-      {/* Confetti owned here */}
       <ConfettiSuccess trigger={showConfetti} emojis={['💸', ' 💵', '💴', '💶', '💷']} />
       <ConfettiFailure trigger={showFailure} emojis={['💀', '☠️', '💩']} />
     </div>

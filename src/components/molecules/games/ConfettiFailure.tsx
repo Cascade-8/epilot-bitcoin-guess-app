@@ -37,8 +37,7 @@ export const ConfettiFailure: React.FC<{ trigger: boolean, emojis: string[] }> =
 
     const gravity = 0.2
 
-
-    particlesRef.current = Array.from({ length: 100 }).map(() => ({
+    particlesRef.current = Array.from({ length: 75 }).map(() => ({
       x: Math.random() * W,
       y: -Math.random() * 750,
       vy: 2 + Math.random() * 2,

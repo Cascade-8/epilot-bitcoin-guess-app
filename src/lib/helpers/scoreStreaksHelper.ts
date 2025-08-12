@@ -1,7 +1,5 @@
-// src/utils/scorestreaksHelper.ts
 export type FuncDef = { raw: string; expr: string; cond?: string }
 
-// Distinct, non-indigo palette
 const FUNC_PALETTE = [
   '#22d3ee', // cyan-400
   '#34d399', // emerald-400
@@ -12,7 +10,7 @@ const FUNC_PALETTE = [
   '#fb7185', // rose-400
   '#f59e0b', // amber-500
 ]
-const DEFAULT_ORANGE = '#fdba74' // orange-300
+const DEFAULT_ORANGE = '#fdba74'
 
 export const getFunctionIndex = (thresholds: string, n: number): number => {
   const { funcs } = parseFuncs(thresholds)
@@ -166,7 +164,6 @@ export const getPreviewData = (
     .map((f, i) => {
       if (!f.cond) return null
 
-      // Compile condition safely
       let cf: ((n: number) => boolean) | null = null
       try {
         // eslint-disable-next-line no-new-func
@@ -199,7 +196,7 @@ export const getPreviewData = (
   const covered = new Array<boolean>(101).fill(false)
   for (const c of conds) for (const n of c.matches) covered[n] = true
 
-  // Build preview rows; compute values via calculateScore (shared logic)
+  // Build preview rows; compute values via calculateScore
   return funcs.map((f, i) => {
     const label = f.cond ? `${i + 1} ${f.raw}` : `${i + 1} Default ${f.raw}`
 

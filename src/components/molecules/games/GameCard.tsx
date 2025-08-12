@@ -1,4 +1,3 @@
-// src/components/molecules/games/GameCard.tsx
 'use client'
 
 import { useState } from 'react'

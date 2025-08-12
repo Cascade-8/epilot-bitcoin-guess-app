@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { GameConfigForm, GameConfig } from '@/components/organisms/forms/GameConfigForm'
+import { GameConfigForm } from '@/components/organisms/forms/GameConfigForm'
 import { GenericButton } from '@/components/atoms/buttons/GenericButton'
 import { useToast } from '@/context/ToastContext'
+import { GameConfig } from '@/app/generated/prisma'
 
 const DEFAULT_CONFIG: GameConfig = {
   name: '',
@@ -14,6 +15,9 @@ const DEFAULT_CONFIG: GameConfig = {
   bettingMode: false,
   maxPlayers: 0,
   duration: 0,
+  id: '',
+  isPublic: null,
+  userId: null
 }
 
 export default function NewConfigPage() {

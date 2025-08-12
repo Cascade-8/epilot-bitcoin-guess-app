@@ -1,5 +1,4 @@
-// src/types/global.d.ts
-export {}  // make this a module
+export {}
 
 declare global {
   var __epilotBootstrapInitialized: boolean | undefined

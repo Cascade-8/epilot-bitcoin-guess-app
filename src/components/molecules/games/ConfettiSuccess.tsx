@@ -26,11 +26,10 @@ export const ConfettiSuccess: React.FC<{
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animRef = useRef<number | null>(null)
   const particlesRef = useRef<Particle[]>([])
-  // capture emojis once
+
   const emojisRef = useRef<string[]>(emojis)
 
   useEffect(() => {
-    // update the ref if trigger just turned true
     if (trigger) emojisRef.current = emojis
   }, [trigger, emojis])
 
@@ -40,12 +39,10 @@ export const ConfettiSuccess: React.FC<{
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')!
 
-    // simple full‐size
     const W = (canvas.width = window.innerWidth)
     const H = (canvas.height = window.innerHeight)
     const gravity = 0.2
 
-    // pre‐render emojis just once
     const emojiImgs: Record<string, HTMLCanvasElement> = {}
     for (const e of emojisRef.current) {
       const off = document.createElement('canvas')
@@ -58,7 +55,6 @@ export const ConfettiSuccess: React.FC<{
       emojiImgs[e] = off
     }
 
-    // reset & spawn
     particlesRef.current = []
     const spawnSide = (x0: number, count: number, dir: 1 | -1) => {
       for (let i = 0; i < count; i++) {
@@ -84,7 +80,6 @@ export const ConfettiSuccess: React.FC<{
 
     const draw = () => {
       ctx.clearRect(0, 0, W, H)
-      // update & render
       for (const p of particlesRef.current) {
         p.vy += gravity
         p.x += p.vx
@@ -103,11 +98,9 @@ export const ConfettiSuccess: React.FC<{
         ctx.restore()
       }
 
-      // remove offscreen
       particlesRef.current = particlesRef.current.filter(
         p => p.y - p.size < H + 50
       )
-
       if (particlesRef.current.length > 0) 
         animRef.current = requestAnimationFrame(draw)
       else 
@@ -119,7 +112,7 @@ export const ConfettiSuccess: React.FC<{
     return () => {
       if (animRef.current != null) cancelAnimationFrame(animRef.current)
     }
-  }, [trigger]) // ← only depend on trigger
+  }, [trigger])
 
   return (
     <canvas
